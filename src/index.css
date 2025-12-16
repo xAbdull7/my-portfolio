@@ -1,16 +1,15 @@
-/* 1. سطور Tailwind الأساسية (ممنوع مسحها!) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* 2. إعدادات الخلفية والخط */
+/* 1. الخلفية والخط */
 body {
   background-color: #000;
   color: white;
   font-family: 'Inter', sans-serif;
 }
 
-/* 3. كود حركة الموسيقى (Spotify Animation) */
+/* 2. كود حركة الموسيقى (Spotify Animation) */
 @keyframes music-bar {
   0%, 100% { height: 100%; opacity: 1; }
   50% { height: 40%; opacity: 0.8; }
