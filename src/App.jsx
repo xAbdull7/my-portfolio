@@ -1,19 +1,17 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { useForm, ValidationError } from '@formspree/react';
 
 // ==========================================
 // 1. DATA & CONTENT (The "Content Layer")
 // ==========================================
 
-// ✅ 1. بيانات المشروع الوهمية (Realistic Mock Data)
 const PROJECTS = [
   {
     id: 1,
     title: "AI SaaS Platform",
     category: "Intelligent Study Assistant",
     shortDesc: "A modern learning platform powered by OpenAI (GPT-4). Generates real-time notes, creates smart quizzes, and tracks student progress.",
-    // قصة المشروع (عشان يبان احترافي)
     story: "Students often struggle with information overload. This platform solves that by using AI to digest complex lectures into concise summaries and actionable quizzes in real-time. It's not just a note-taking app; it's a personalized tutor.",
-    // المميزات الرئيسية
     features: [
       "🤖 AI-Powered Summarization (GPT-4)",
       "📊 Real-time Progress Analytics",
@@ -55,6 +53,7 @@ const TECH_STACK = {
 // ==========================================
 // 2. MAIN APPLICATION
 // ==========================================
+
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,7 +69,7 @@ function App() {
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
   
-  // 🆕 دوال فتح وغلق تفاصيل المشروع
+  //   فتح وغلق تفاصيل المشروع
   const openProject = useCallback((project) => setSelectedProject(project), []);
   const closeProject = useCallback(() => setSelectedProject(null), []);
 
@@ -81,8 +80,6 @@ function App() {
 
   return (
     <div className={`min-h-screen font-sans p-4 md:p-8 flex flex-col items-center transition-colors duration-500 ease-in-out relative ${pageClass} overflow-x-hidden`}>
-      
-      {/* Styles Injection */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;500&display=swap');
         :root { font-family: 'Inter', sans-serif; }
@@ -109,7 +106,7 @@ function App() {
       
       <ContactModal isOpen={isModalOpen} onClose={closeModal} isDarkMode={isDarkMode} />
       
-      {/* 🆕 PROJECT DETAIL MODAL */}
+      {/* PROJECT DETAIL MODAL */}
       <ProjectDetailModal project={selectedProject} onClose={closeProject} isDarkMode={isDarkMode} />
 
       <Footer isDarkMode={isDarkMode} />
@@ -121,7 +118,6 @@ function App() {
 // 3. COMPONENTS
 // ==========================================
 
-// ✅ 1. Project Card (Updated to act as a trigger)
 const ProjectCard = memo(({ isDarkMode, project, onOpen }) => {
   const cardStyle = isDarkMode ? "bg-zinc-900 border-zinc-800 hover:border-zinc-700" : "bg-white border-gray-200 shadow-sm hover:border-gray-300 hover:shadow-md";
   return (
@@ -149,7 +145,6 @@ const ProjectCard = memo(({ isDarkMode, project, onOpen }) => {
   );
 });
 
-// ✅ 2. PROJECT DETAIL MODAL (The New Feature)
 const ProjectDetailModal = ({ project, onClose, isDarkMode }) => {
   if (!project) return null;
 
@@ -235,8 +230,6 @@ const ProjectDetailModal = ({ project, onClose, isDarkMode }) => {
   );
 };
 
-// --- (REST OF THE COMPONENTS are the same as before: Header, Footer, Dock, etc.) ---
-// --- Copying them below for a complete working file ---
 
 const Header = memo(({ isDarkMode }) => (
   <header className="text-center mb-10 max-w-xl mx-auto animate-fade-in relative w-full pt-8 font-mono z-10">
@@ -367,7 +360,7 @@ const GithubStatsCard = memo(({ isDarkMode }) => {
   );
 });
 
-// ✅ CERTIFICATES SLIDER
+//  CERTIFICATES SLIDER
 const CertificatesSlider = memo(({ isDarkMode }) => {
   return (
     <div className="md:col-span-12 mt-8 relative group">
@@ -411,21 +404,143 @@ const CertificateCard = ({ cert, isDarkMode }) => (
 );
 
 const ContactModal = ({ isOpen, onClose, isDarkMode }) => {
+  const FORMSPREE_ID = "xeoybpwz"; 
+  const [state, handleSubmit] = useForm(FORMSPREE_ID); 
   const [subject, setSubject] = useState("🚧 Project Inquiry");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  
   if (!isOpen) return null;
+
   const focusRingClass = isDarkMode ? "focus:ring-green-500/50" : "focus:ring-blue-500/50";
   const activeItemClass = isDarkMode ? "bg-green-500/20 text-green-400" : "bg-blue-50 text-blue-600";
   const hoverItemClass = isDarkMode ? "hover:bg-zinc-800" : "hover:bg-gray-50";
   const buttonClass = isDarkMode ? "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 shadow-green-500/25" : "bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 shadow-blue-500/25";
+
+  if (state.succeeded) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={onClose}></div>
+            <div className={`relative w-full max-w-sm p-10 text-center rounded-[32px] border shadow-2xl animate-fade-in-up ${isDarkMode ? 'bg-zinc-900 border-white/10 text-white' : 'bg-white border-black/10 text-black'}`}>
+                <i className={`fas fa-check-circle text-5xl mb-4 ${isDarkMode ? 'text-green-500' : 'text-blue-600'}`}></i>
+                <h3 className="text-xl font-black mb-2">Message Sent!</h3>
+                <p className="text-sm">Thank you for reaching out. I will reply soon!</p>
+                <button onClick={onClose} className="mt-6 px-4 py-2 bg-zinc-700/50 text-white rounded-lg hover:bg-zinc-700 transition">Close</button>
+            </div>
+        </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300" onClick={onClose}></div>
       <div className={`relative w-full max-w-lg p-8 rounded-[32px] border shadow-2xl transform transition-all scale-100 animate-fade-in-up overflow-visible ${isDarkMode ? 'bg-zinc-900/80 backdrop-blur-2xl border-white/10 shadow-black/50' : 'bg-white/90 backdrop-blur-xl border-white/40 shadow-xl'}`}>
-        {isDarkMode && <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/5 to-transparent pointer-events-none"></div>}
+        
         <button onClick={onClose} className={`absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full transition-all duration-300 ${isDarkMode ? 'bg-white/5 hover:bg-white/20 text-zinc-400 hover:text-white' : 'bg-black/5 hover:bg-black/10 text-gray-500'}`}><i className="fas fa-times text-sm"></i></button>
+        
         <div className="mb-8"><h2 className={`text-3xl font-black mb-2 tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Get in touch<span className={isDarkMode ? "text-green-500" : "text-blue-600"}>.</span></h2><p className={`text-sm font-medium font-mono ${isDarkMode ? 'text-green-400' : 'text-blue-600'}`}>// Fill out the form below and I'll get back to you soon.</p></div>
-        <form className="space-y-5" onSubmit={(e) => e.preventDefault()}><div className="grid grid-cols-2 gap-4"><div className="space-y-1.5"><label className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Name</label><input type="text" placeholder="Abdullah" className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`} /></div><div className="space-y-1.5"><label className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Email</label><input type="email" placeholder="hello@example.com" className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`} /></div></div><div className="space-y-1.5 relative"><label className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Subject</label><button type="button" onClick={() => setIsDropdownOpen(!isDropdownOpen)} className={`w-full px-4 py-3 rounded-xl border flex justify-between items-center transition-all ${isDarkMode ? `bg-zinc-950/50 border-zinc-800 text-white hover:bg-zinc-950 ${isDropdownOpen ? 'ring-2 ring-green-500/50 border-transparent' : ''}` : `bg-gray-50 border-gray-200 text-gray-900 ${isDropdownOpen ? 'ring-2 ring-blue-500/50 border-transparent' : ''}`}`}><span>{subject}</span><i className={`fas fa-chevron-down text-xs transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}></i></button>{isDropdownOpen && (<div className={`absolute left-0 right-0 top-full mt-2 rounded-xl border shadow-xl z-20 overflow-hidden animate-fade-in-up ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>{SUBJECT_OPTIONS.map((option, idx) => (<div key={idx} onClick={() => { setSubject(option); setIsDropdownOpen(false); }} className={`px-4 py-3 text-sm cursor-pointer transition-colors ${subject === option ? activeItemClass : (isDarkMode ? 'text-zinc-300' : 'text-gray-700')} ${hoverItemClass}`}>{option}</div>))}</div>)}</div><div className="space-y-1.5"><label className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Message</label><textarea rows="4" placeholder="Tell me more about your project..." className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all resize-none ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`}></textarea></div><button className={`w-full py-4 rounded-xl text-white font-bold shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 ${buttonClass}`}>Send Message <i className="fas fa-paper-plane text-xs"></i></button></form></div></div>
+        
+        {/* ======================= FORM (Formspree Integration) ======================= */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                    <label htmlFor="name" className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Name</label>
+                    <input 
+                        id="name"
+                        type="text" 
+                        name="name" 
+                        placeholder="Abdullah" 
+                        className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`} 
+                    />
+                     <ValidationError 
+                        prefix="Name" 
+                        field="name"
+                        errors={state.errors}
+                        className="text-red-400 text-xs mt-1"
+                    />
+                </div>
+
+                <div className="space-y-1.5">
+                    <label htmlFor="email" className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Email</label>
+                    <input 
+                        id="email"
+                        type="email" 
+                        name="email" 
+                        placeholder="hello@example.com" 
+                        className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`} 
+                    />
+                    <ValidationError 
+                        prefix="Email" 
+                        field="email"
+                        errors={state.errors}
+                        className="text-red-400 text-xs mt-1"
+                    />
+                </div>
+            </div>
+            
+            <div className="space-y-1.5 relative">
+                <label className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Subject</label>
+                
+                <input type="hidden" name="subject" value={subject} />
+
+                <button 
+                    type="button" 
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+                    className={`w-full px-4 py-3 rounded-xl border flex justify-between items-center transition-all ${isDarkMode ? `bg-zinc-950/50 border-zinc-800 text-white hover:bg-zinc-950 ${isDropdownOpen ? 'ring-2 ring-green-500/50 border-transparent' : ''}` : `bg-gray-50 border-gray-200 text-gray-900 ${isDropdownOpen ? 'ring-2 ring-blue-500/50 border-transparent' : ''}`}`}
+                >
+                    <span>{subject}</span>
+                    <i className={`fas fa-chevron-down text-xs transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''} ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}></i>
+                </button>
+                {isDropdownOpen && (
+                    <div className={`absolute left-0 right-0 top-full mt-2 rounded-xl border shadow-xl z-20 overflow-hidden animate-fade-in-up ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-gray-200'}`}>
+                        {SUBJECT_OPTIONS.map((option, idx) => (
+                            <div 
+                                key={idx} 
+                                onClick={() => { setSubject(option); setIsDropdownOpen(false); }} 
+                                className={`px-4 py-3 text-sm cursor-pointer transition-colors ${subject === option ? activeItemClass : (isDarkMode ? 'text-zinc-300' : 'text-gray-700')} ${hoverItemClass}`}
+                            >
+                                {option}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            
+            <div className="space-y-1.5">
+                <label htmlFor="message" className={`text-[10px] font-bold tracking-wider uppercase ml-1 ${isDarkMode ? 'text-zinc-500' : 'text-gray-400'}`}>Message</label>
+                <textarea 
+                    id="message"
+                    name="message" 
+                    rows="4" 
+                    placeholder="Tell me more about your project..." 
+                    className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 ${focusRingClass} transition-all resize-none ${isDarkMode ? 'bg-zinc-950/50 border-zinc-800 text-white placeholder-zinc-700 hover:bg-zinc-950' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'}`}
+                ></textarea>
+                <ValidationError 
+                    prefix="Message" 
+                    field="message"
+                    errors={state.errors}
+                    className="text-red-400 text-xs mt-1"
+                />
+            </div>
+
+            <button 
+                className={`w-full py-4 rounded-xl text-white font-bold shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 ${buttonClass}`}
+                type="submit"
+                disabled={state.submitting}
+            >
+                {state.submitting ? (
+                    <>
+                        <div className="w-4 h-4 border-2 border-white border-t-indigo-300 rounded-full animate-spin"></div>
+                        Sending...
+                    </>
+                ) : (
+                    <>
+                        Send Message <i className="fas fa-paper-plane text-xs"></i>
+                    </>
+                )}
+            </button>
+        </form>        
+      </div>
+    </div>
   );
 };
 
