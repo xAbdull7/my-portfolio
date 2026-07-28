@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  badge       String?
+  link        String
+  linkText    String   @default("Visit Site")
+  icon        String   @default("avatar")
+  tags        String[]
+  stats       Json?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Profile {
+  id          String   @id @default("default")
+  name        String
+  role        String
+  bio         String
+  resumeUrl   String?
+  githubUrl   String?
+  linkedinUrl String?
+  twitterUrl  String?
+  emailUrl    String?
+  
+  softSkills  Json?
+  languages   Json?
+  
+  eduMajor    String?
+  eduUni      String?
+  eduYear     String?
+
+  spotifyPlaylist String?
+  spotifySong     String?
+  spotifyExplicit Boolean @default(false)
+
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
+
+  updatedAt   DateTime @updatedAt
+}
+
+model TechStack {
+  id        String   @id @default("default")
+  languages String
+  data      String
+  web       String
+  devops    String
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model PageVisit {
+  id        String   @id @default(cuid())
+  path      String
+  visitedAt DateTime @default(now())
+}
