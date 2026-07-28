@@ -387,12 +387,12 @@ export default function ProjectsAdmin() {
                     <select 
                       value={formData.icon} 
                       onChange={(e) => setFormData({...formData, icon: e.target.value})}
-                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm appearance-none"
+                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
                     >
-                      <option value="library">Library (Code)</option>
-                      <option value="terminal">Terminal</option>
-                      <option value="avatar">Avatar (People)</option>
-                      <option value="hexagon">Hexagon (Misc)</option>
+                      <option value="library" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Library (Code)</option>
+                      <option value="terminal" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Terminal</option>
+                      <option value="avatar" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Avatar (People)</option>
+                      <option value="hexagon" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Hexagon (Misc)</option>
                     </select>
                   </div>
                   <div className="space-y-1.5">
