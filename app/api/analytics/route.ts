@@ -37,7 +37,7 @@ export async function GET() {
     // Calculate today's visits
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayVisits = visits.filter(v => new Date(v.visitedAt) >= today).length;
+    const todayVisits = visits.filter((v: any) => new Date(v.visitedAt) >= today).length;
 
     return NextResponse.json({
       totalVisits,
