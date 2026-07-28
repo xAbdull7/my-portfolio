@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from '@/components/ThemeProvider';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import { Toaster } from 'sonner';
 
 // ده الخط الأساسي اللي هنستخدمه في الموقع
 const geistSans = Geist({
@@ -72,6 +73,7 @@ export default function RootLayout({
         >
           {children}
           <AnalyticsTracker />
+          <Toaster position="bottom-right" theme="system" />
         </ThemeProvider>
       </body>
     </html>
