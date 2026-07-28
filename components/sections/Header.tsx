@@ -54,25 +54,34 @@ export default function Header({ profile }: { profile: any }) {
       
       <div className="flex flex-wrap items-center justify-center gap-3 pt-6">
         {profile.resumeUrl && (
-          <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 text-sm font-sans font-bold rounded-xl transition-all shadow-sm bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-900 dark:focus:ring-white">
-            {getIcon('download')} Download CV
+          <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" className="relative inline-flex h-10 overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white">
+            <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
+            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-white dark:bg-[#050505] px-4 py-2.5 text-[13px] font-sans font-semibold text-zinc-900 dark:text-zinc-300 backdrop-blur-3xl gap-2.5 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+              {getIcon('download')} Download CV
+            </span>
           </a>
         )}
         {profile.emailUrl && (
           <>
-            <EmailButton className="flex items-center gap-2 px-5 py-2.5 text-sm font-sans font-bold rounded-xl transition-all bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-500/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-              {getIcon('mail')} Hire Me
+            <EmailButton className="relative inline-flex h-10 overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white">
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
+              <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-white dark:bg-[#050505] px-4 py-2.5 text-[13px] font-sans font-semibold text-zinc-900 dark:text-zinc-300 backdrop-blur-3xl gap-2.5 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                {getIcon('mail')} Hire Me
+              </span>
             </EmailButton>
             <button 
               onClick={handleCopyEmail}
-              className="flex items-center gap-2 px-4 py-2.5 text-xs font-sans font-semibold border border-zinc-200 dark:border-white/10 rounded-xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors text-zinc-900 dark:text-zinc-300 focus:outline-none bg-transparent"
+              className="relative inline-flex h-10 overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
               title="Copy Email Address"
             >
-              {copied ? getIcon('check') : getIcon('copy')}
+              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
+              <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl bg-white dark:bg-[#050505] px-4 py-2.5 text-[13px] font-sans font-semibold text-zinc-900 dark:text-zinc-300 backdrop-blur-3xl gap-2.5 hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors">
+                {copied ? getIcon('check') : getIcon('copy')}
+              </span>
             </button>
           </>
         )}
-        <button onClick={toggleTheme} aria-label="Toggle Theme" className="flex items-center justify-center w-[42px] h-[42px] rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors bg-transparent focus:outline-none">
+        <button onClick={toggleTheme} aria-label="Toggle Theme" className="flex items-center justify-center w-[40px] h-[40px] rounded-xl border border-zinc-200 dark:border-white/10 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors bg-transparent focus:outline-none">
           {mounted ? (theme === 'dark' ? <Sun size={16} strokeWidth={2} /> : <Moon size={16} strokeWidth={2} />) : <div className="w-4 h-4" />}
         </button>
       </div>
