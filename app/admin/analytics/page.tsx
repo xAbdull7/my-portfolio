@@ -79,7 +79,7 @@ export default function AnalyticsAdmin() {
           <p className="text-zinc-500 text-sm">No visits recorded yet.</p>
         ) : (
           <div className="space-y-4">
-            {data?.recentVisits?.map(v => (
+            {data?.recentVisits?.map((v: any) => (
               <div key={v.id} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
                 <span className="font-medium text-sm truncate max-w-[200px] md:max-w-md">{v.path}</span>
                 <span className="text-xs text-zinc-500">{new Date(v.visitedAt).toLocaleString()}</span>
