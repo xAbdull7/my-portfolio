@@ -70,11 +70,19 @@ export default function SkillsWidget({ profile }: { profile: any }) {
           {(profile?.languages || []).map((lang: any, index: number) => {
             const isObj = typeof lang === 'object' && lang !== null;
             const langName = isObj ? lang.name : lang;
-            const langLevel = isObj ? (lang.level === 'Native' ? '100%' : lang.level === 'Fluent' ? '90%' : '75%') : '85%';
+            const langLevel = isObj ? (
+              lang.level === 'Native' ? '100%' : 
+              lang.level === 'Fluent' ? '85%' : 
+              lang.level === 'Intermediate' ? '60%' : 
+              '40%' // Beginner
+            ) : '85%';
             return (
               <div key={langName || index} className="flex flex-col gap-2">
-                <div className="flex justify-between items-center text-[12px] font-sans">
+                <div className="flex justify-between items-center text-[12px] font-sans mb-1">
                   <span className="font-semibold text-zinc-900 dark:text-zinc-200 whitespace-nowrap">{langName}</span>
+                  {isObj && lang.level && (
+                    <span className="text-zinc-500 text-[10px] font-medium tracking-wide">{lang.level}</span>
+                  )}
                 </div>
                 <div className="w-full h-1.5 bg-zinc-200 dark:bg-white/10 rounded-full overflow-hidden">
                   <div 

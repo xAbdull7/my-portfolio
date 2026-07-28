@@ -10,7 +10,7 @@ export default function ProfileAdmin() {
     name: '', role: '', bio: '',
     resumeUrl: '', githubUrl: '', linkedinUrl: '', twitterUrl: '', emailUrl: '',
     eduMajor: '', eduUni: '', eduYear: '',
-    softSkills: '', languages: '',
+    softSkills: '', languages: [] as {name: string, level: string}[],
     seoTitle: '', seoDescription: '', seoKeywords: ''
   });
 
@@ -34,7 +34,12 @@ export default function ProfileAdmin() {
               eduUni: data.eduUni || '',
               eduYear: data.eduYear || '',
               softSkills: data.softSkills ? data.softSkills.join(', ') : '',
-              languages: data.languages ? data.languages.join(', ') : '',
+              languages: data.languages && Array.isArray(data.languages) ? data.languages.map((l: any) => {
+                if (typeof l === 'string') {
+                  return { name: l.replace('[object Object]', '').trim() || 'Unknown', level: 'Fluent' };
+                }
+                return l;
+              }).filter((l: any) => l.name) : [],
               seoTitle: data.seoTitle || '',
               seoDescription: data.seoDescription || '',
               seoKeywords: data.seoKeywords || '',
@@ -56,8 +61,8 @@ export default function ProfileAdmin() {
     // Parse arrays
     const payload = {
       ...formData,
-      softSkills: formData.softSkills.split(',').map(s => s.trim()).filter(Boolean),
-      languages: formData.languages.split(',').map(s => s.trim()).filter(Boolean),
+      softSkills: formData.softSkills.split(',').map((s: string) => s.trim()).filter(Boolean),
+      languages: formData.languages.filter(l => l.name.trim() !== ''),
     };
 
     try {
@@ -172,14 +177,62 @@ export default function ProfileAdmin() {
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <Brain className="text-zinc-400" /> Soft Skills & Languages
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Soft Skills (comma separated)</label>
               <textarea rows={3} value={formData.softSkills} onChange={(e) => setFormData({...formData, softSkills: e.target.value})} className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm resize-none" placeholder="Communication, Teamwork..." />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Languages (comma separated)</label>
-              <textarea rows={3} value={formData.languages} onChange={(e) => setFormData({...formData, languages: e.target.value})} className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm resize-none" placeholder="English, Arabic..." />
+            
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Languages & Proficiency</label>
+              <div className="space-y-2">
+                {formData.languages.map((lang, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <input 
+                      value={lang.name}
+                      onChange={(e) => {
+                        const newLangs = [...formData.languages];
+                        newLangs[index].name = e.target.value;
+                        setFormData({...formData, languages: newLangs});
+                      }}
+                      placeholder="e.g. English"
+                      className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
+                    />
+                    <select 
+                      value={lang.level}
+                      onChange={(e) => {
+                        const newLangs = [...formData.languages];
+                        newLangs[index].level = e.target.value;
+                        setFormData({...formData, languages: newLangs});
+                      }}
+                      className="w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm appearance-none cursor-pointer"
+                    >
+                      <option value="Native">Native</option>
+                      <option value="Fluent">Fluent</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Beginner">Beginner</option>
+                    </select>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const newLangs = formData.languages.filter((_, i) => i !== index);
+                        setFormData({...formData, languages: newLangs});
+                      }}
+                      className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-colors shrink-0 flex items-center justify-center"
+                      title="Remove Language"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <button 
+                type="button"
+                onClick={() => setFormData({...formData, languages: [...formData.languages, {name: '', level: 'Fluent'}]})}
+                className="text-sm font-semibold text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/10 px-5 py-2.5 rounded-full hover:bg-zinc-200 dark:hover:bg-white/20 transition-colors mt-2"
+              >
+                + Add Language
+              </button>
             </div>
           </div>
         </div>
