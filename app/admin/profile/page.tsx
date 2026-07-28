@@ -205,12 +205,12 @@ export default function ProfileAdmin() {
                         newLangs[index].level = e.target.value;
                         setFormData({...formData, languages: newLangs});
                       }}
-                      className="w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm appearance-none cursor-pointer"
+                      className="w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
                     >
-                      <option value="Native">Native</option>
-                      <option value="Fluent">Fluent</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Beginner">Beginner</option>
+                      <option value="Native" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Native</option>
+                      <option value="Fluent" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Fluent</option>
+                      <option value="Intermediate" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Intermediate</option>
+                      <option value="Beginner" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Beginner</option>
                     </select>
                     <button 
                       type="button"
