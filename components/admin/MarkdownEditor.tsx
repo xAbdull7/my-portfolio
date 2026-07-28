@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+import { motion } from 'framer-motion';
+
 interface MarkdownEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -15,30 +17,32 @@ export default function MarkdownEditor({ value, onChange, placeholder = "Write s
   const [activeTab, setActiveTab] = useState<'write' | 'preview'>('write');
 
   return (
-    <div className="border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-[#0a0a0a] focus-within:border-blue-500 transition-colors">
-      <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5">
-        <button
-          type="button"
-          onClick={() => setActiveTab('write')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-            activeTab === 'write' 
-              ? 'bg-white dark:bg-white/10 text-zinc-900 dark:text-white shadow-sm' 
-              : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-          }`}
-        >
-          Write
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab('preview')}
-          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-            activeTab === 'preview' 
-              ? 'bg-white dark:bg-white/10 text-zinc-900 dark:text-white shadow-sm' 
-              : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
-          }`}
-        >
-          Preview
-        </button>
+    <div className="border border-zinc-200 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-[#0a0a0a] focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 transition-all shadow-sm">
+      <div className="flex items-center gap-1 px-4 py-3 border-b border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-[#111]">
+        <div className="flex bg-zinc-200/50 dark:bg-white/5 p-1 rounded-xl relative">
+          {['write', 'preview'].map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setActiveTab(tab as 'write' | 'preview')}
+              className={`relative px-4 py-1.5 text-xs font-semibold rounded-lg transition-colors z-10 capitalize ${
+                activeTab === tab
+                  ? 'text-zinc-900 dark:text-white'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
+              }`}
+            >
+              {activeTab === tab && (
+                <motion.div
+                  layoutId="activeTabIndicator"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-lg shadow-sm"
+                  style={{ zIndex: -1 }}
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="p-0">

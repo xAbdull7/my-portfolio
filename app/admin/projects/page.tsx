@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Edit2, Trash2, Plus, GripVertical, Folder, X, Save, Eye, EyeOff, ExternalLink } from 'lucide-react';
+import { Edit2, Trash2, Plus, GripVertical, Folder, X, Save, Eye, EyeOff, ExternalLink, Terminal, User, Hexagon, Check, Library } from 'lucide-react';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 import {
   DndContext,
@@ -105,6 +105,31 @@ export default function ProjectsAdmin() {
     tags: '',
     published: true,
   });
+  const [tagInput, setTagInput] = useState('');
+
+  const currentTags = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+  const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      if (tagInput.trim() && !currentTags.includes(tagInput.trim())) {
+        setFormData({...formData, tags: [...currentTags, tagInput.trim()].join(', ')});
+      }
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (indexToRemove: number) => {
+    setFormData({...formData, tags: currentTags.filter((_, i) => i !== indexToRemove).join(', ')});
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && tagInput === '' && currentTags.length > 0) {
+      removeTag(currentTags.length - 1);
+    } else {
+      addTag(e);
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -183,6 +208,7 @@ export default function ProjectsAdmin() {
         tags: '',
         published: true,
       });
+      setTagInput('');
     }
     setIsModalOpen(true);
   };
@@ -317,15 +343,34 @@ export default function ProjectsAdmin() {
             
             <form onSubmit={handleSave} className="p-6 md:p-8 space-y-6">
               
-              <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/5">
-                <div>
-                  <h4 className="font-semibold text-sm text-zinc-900 dark:text-white">Publish Status</h4>
+              <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/5 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <h4 className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+                    Publish Status
+                    {formData.published ? (
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                    ) : (
+                      <span className="flex h-2 w-2 relative">
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
+                      </span>
+                    )}
+                  </h4>
                   <p className="text-xs text-zinc-500 mt-1">If unchecked, this project will be saved as a draft and hidden.</p>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" checked={formData.published} onChange={e => setFormData({...formData, published: e.target.checked})} />
-                  <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
-                </label>
+                
+                <button
+                  type="button"
+                  onClick={() => setFormData({...formData, published: !formData.published})}
+                  className="relative inline-flex h-10 w-28 overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white flex-shrink-0 z-10"
+                >
+                  <span className={`absolute inset-[-1000%] animate-[spin_3s_linear_infinite] ${formData.published ? 'bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]' : 'bg-transparent'}`} />
+                  <span className={`inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl px-4 py-2 text-xs font-sans font-bold transition-colors ${formData.published ? 'bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200' : 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-500 hover:bg-zinc-200 dark:hover:bg-[#222]'}`}>
+                    {formData.published ? 'Published' : 'Draft'}
+                  </span>
+                </button>
               </div>
 
               <div className="space-y-4">
@@ -381,28 +426,55 @@ export default function ProjectsAdmin() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Icon Type</label>
-                    <select 
-                      value={formData.icon} 
-                      onChange={(e) => setFormData({...formData, icon: e.target.value})}
-                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
-                    >
-                      <option value="library" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Library (Code)</option>
-                      <option value="terminal" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Terminal</option>
-                      <option value="avatar" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Avatar (People)</option>
-                      <option value="hexagon" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Hexagon (Misc)</option>
-                    </select>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { id: 'library', icon: Library, label: 'Library' },
+                        { id: 'terminal', icon: Terminal, label: 'Terminal' },
+                        { id: 'avatar', icon: User, label: 'Avatar' },
+                        { id: 'hexagon', icon: Hexagon, label: 'Hexagon' },
+                      ].map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => setFormData({...formData, icon: item.id})}
+                          className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border transition-all ${
+                            formData.icon === item.id
+                              ? 'bg-zinc-900 dark:bg-white border-zinc-900 dark:border-white text-white dark:text-black shadow-sm'
+                              : 'bg-zinc-50 dark:bg-white/5 border-zinc-200 dark:border-white/10 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <item.icon size={20} />
+                          <span className="text-xs font-medium">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags (comma separated)</label>
-                    <input 
-                      value={formData.tags} 
-                      onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                      className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
-                      placeholder="React, Next.js, Tailwind..."
-                    />
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Tags</label>
+                    <div className="w-full p-2 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus-within:ring-2 focus-within:ring-zinc-900 dark:focus-within:ring-white transition-all min-h-[50px] flex flex-wrap gap-2 items-center">
+                      {currentTags.map((tag, index) => (
+                        <span key={index} className="flex items-center gap-1 bg-zinc-200 dark:bg-white/10 text-zinc-800 dark:text-zinc-200 px-2.5 py-1 rounded-lg text-xs font-medium animate-in zoom-in duration-200">
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeTag(index)}
+                            className="hover:bg-zinc-300 dark:hover:bg-white/20 rounded-full p-0.5 transition-colors"
+                          >
+                            <X size={12} />
+                          </button>
+                        </span>
+                      ))}
+                      <input 
+                        value={tagInput} 
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={handleTagInputKeyDown}
+                        className="flex-1 bg-transparent border-none focus:outline-none text-sm min-w-[120px] px-2 py-1 text-zinc-900 dark:text-white"
+                        placeholder={currentTags.length === 0 ? "Type and press Enter..." : ""}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -417,9 +489,12 @@ export default function ProjectsAdmin() {
                 </button>
                 <button 
                   type="submit"
-                  className="bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-2.5 rounded-full font-medium flex items-center gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors text-sm shadow-md"
+                  className="relative inline-flex h-10 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
                 >
-                  <Save size={16} /> Save Project
+                  <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
+                  <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-sans font-medium backdrop-blur-3xl gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-md">
+                    <Save size={16} /> Save Project
+                  </span>
                 </button>
               </div>
             </form>
