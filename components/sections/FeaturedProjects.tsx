@@ -20,7 +20,7 @@ export default async function FeaturedProjects({ showDrafts = false }: { showDra
 
   return (
     <>
-      {featuredProjects.map((project, index) => (
+      {featuredProjects.map((project: any, index: number) => (
         <div key={project.id} className="flex flex-col p-7 border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-[#050505] rounded-[24px] min-h-[380px] transition-colors duration-300">
           <div>
             <div className="flex items-start justify-between mb-2">
@@ -75,7 +75,7 @@ export default async function FeaturedProjects({ showDrafts = false }: { showDra
           <div className="space-y-6 mt-auto">
             {project.tags && project.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {project.tags.map(tag => (
+                {project.tags.map((tag: any) => (
                   <span key={tag} className="px-2.5 py-1 text-[11px] font-sans font-medium border border-zinc-200 dark:border-white/10 rounded-[6px] text-zinc-600 dark:text-zinc-300 bg-transparent">
                     {tag}
                   </span>
