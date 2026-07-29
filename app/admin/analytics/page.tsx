@@ -152,14 +152,30 @@ export default function AnalyticsAdmin() {
         </div>
       </div>
 
+      {/* Geographic Distribution - Full Width */}
+      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm">
+         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+          <Globe className="text-zinc-400" /> Geographic Distribution
+        </h3>
+        <div className="space-y-4">
+           {data?.geoDistribution && data.geoDistribution.length > 0 ? (
+              <div className="w-full h-full min-h-[400px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center cursor-move">
+                 <GeoMap data={data.geoDistribution} />
+              </div>
+           ) : (
+             <p className="text-zinc-500 text-sm">No location data available.</p>
+           )}
+        </div>
+      </div>
+
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 7 Day Trend */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 flex flex-col h-full">
            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <TrendingUp className="text-zinc-400" /> 7-Day Traffic Trend
           </h3>
-          <div className="h-[300px] w-full">
+          <div className="flex-1 min-h-[300px] w-full">
             {data?.chartData && data.chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data.chartData}>
@@ -178,11 +194,11 @@ export default function AnalyticsAdmin() {
         </div>
 
         {/* Device Distribution */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col h-full">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <Monitor className="text-zinc-400" /> Device Split
           </h3>
-          <div className="flex-1 flex flex-col items-center justify-center">
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[300px]">
             {data?.deviceDistribution && data.deviceDistribution.length > 0 ? (
               <>
                 <div className="h-[200px] w-full">
@@ -213,9 +229,9 @@ export default function AnalyticsAdmin() {
         </div>
       </div>
 
-      {/* Top Pages and Geography */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm">
+      {/* Top Pages and Recent Visits */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-1 h-fit">
            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <LayoutTemplate className="text-zinc-400" /> Top Visited Pages
           </h3>
@@ -223,8 +239,8 @@ export default function AnalyticsAdmin() {
              {data?.topPages && data.topPages.length > 0 ? data.topPages.map((page: any, i: number) => (
                <div key={page.path} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
                  <div className="flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs">{i + 1}</div>
-                   <span className="font-semibold text-sm truncate max-w-[200px] md:max-w-xs">{page.path}</span>
+                   <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">{i + 1}</div>
+                   <span className="font-semibold text-sm truncate max-w-[150px]">{page.path}</span>
                  </div>
                  <div className="font-black text-lg">{page.count}</div>
                </div>
@@ -234,115 +250,100 @@ export default function AnalyticsAdmin() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm">
-           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <Globe className="text-zinc-400" /> Geographic Distribution
-          </h3>
-          <div className="space-y-4">
-             {data?.geoDistribution && data.geoDistribution.length > 0 ? (
-                <div className="w-full h-full min-h-[300px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center">
-                   <GeoMap data={data.geoDistribution} />
-                </div>
-             ) : (
-               <p className="text-zinc-500 text-sm">No location data available.</p>
-             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Visits Log */}
-      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <h3 className="text-xl font-bold flex items-center gap-3">
-            <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl">
-              <BarChart3 size={20} className="text-blue-600 dark:text-blue-400" />
-            </div>
-            Detailed Visit Logs
-          </h3>
-          <div className="flex items-center gap-3">
-             <button 
-                onClick={toggleAll}
-                className="px-4 py-2 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
-              >
-                {selectedIds.length === data?.recentVisits?.length && data?.recentVisits?.length > 0 ? <CheckSquare size={16}/> : <Square size={16}/>}
-                Select All
-              </button>
-             {selectedIds.length > 0 && (
-               <button 
-                 onClick={handleDeleteSelected}
-                 disabled={isDeleting}
-                 className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 animate-in zoom-in"
-               >
-                 <Trash2 size={16} /> Delete ({selectedIds.length})
-               </button>
-             )}
-          </div>
-        </div>
-        
-        {data?.recentVisits?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-              <Eye size={24} className="text-zinc-400" />
-            </div>
-            <h4 className="text-zinc-900 dark:text-white font-medium mb-1">No visits recorded yet</h4>
-            <p className="text-zinc-500 text-sm">Wait for some traffic to see detailed analytics here.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {data?.recentVisits?.map((v: any) => {
-              const isSelected = selectedIds.includes(v.id);
-              return (
-              <div 
-                key={v.id} 
-                onClick={() => toggleSelection(v.id)}
-                className={`group flex flex-col md:flex-row md:items-center justify-between p-4 md:p-5 rounded-3xl transition-all duration-300 border cursor-pointer gap-4
-                  ${isSelected 
-                    ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' 
-                    : 'bg-zinc-50 dark:bg-white/5 border-transparent hover:border-zinc-200 dark:hover:border-white/10'
-                  }`}
-              >
-                
-                <div className="flex items-center gap-4">
-                  <div className={`text-zinc-400 transition-colors ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`}>
-                    {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
-                  </div>
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${v.device === 'Mobile' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'}`}>
-                    {v.device === 'Mobile' ? <Smartphone size={24} /> : <Monitor size={24} />}
-                  </div>
-                  
-                  <div className="flex flex-col">
-                    <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
-                      <LayoutTemplate size={14} className="text-zinc-400" />
-                      {v.path}
-                    </span>
-                    <span className="text-xs text-zinc-500 flex items-center gap-1 mt-1.5 font-medium">
-                      <Clock size={12} />
-                      {new Date(v.visitedAt).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 md:justify-end">
-                  {v.country && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
-                      <Globe size={14} className="text-blue-500" />
-                      {v.city && v.city !== 'Unknown' ? `${v.city}, ` : ''}{v.country}
-                    </span>
-                  )}
-                  {(v.browser || v.os) && (
-                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
-                      {v.browser && v.browser !== 'Unknown' ? v.browser : ''}
-                      {v.browser && v.browser !== 'Unknown' && v.os && v.os !== 'Unknown' ? ' on ' : ''}
-                      {v.os && v.os !== 'Unknown' ? v.os : ''}
-                      {(!v.browser || v.browser === 'Unknown') && (!v.os || v.os === 'Unknown') ? 'Unknown Device' : ''}
-                    </span>
-                  )}
-                </div>
-
+        {/* Recent Visits Log */}
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <h3 className="text-xl font-bold flex items-center gap-3">
+              <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl">
+                <BarChart3 size={20} className="text-blue-600 dark:text-blue-400" />
               </div>
-            )})}
+              Detailed Visit Logs
+            </h3>
+            <div className="flex items-center gap-3">
+               <button 
+                  onClick={toggleAll}
+                  className="px-4 py-2 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+                >
+                  {selectedIds.length === data?.recentVisits?.length && data?.recentVisits?.length > 0 ? <CheckSquare size={16}/> : <Square size={16}/>}
+                  Select All
+                </button>
+               {selectedIds.length > 0 && (
+                 <button 
+                   onClick={handleDeleteSelected}
+                   disabled={isDeleting}
+                   className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 animate-in zoom-in"
+                 >
+                   <Trash2 size={16} /> Delete ({selectedIds.length})
+                 </button>
+               )}
+            </div>
           </div>
-        )}
+          
+          {data?.recentVisits?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-16 h-16 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
+                <Eye size={24} className="text-zinc-400" />
+              </div>
+              <h4 className="text-zinc-900 dark:text-white font-medium mb-1">No visits recorded yet</h4>
+              <p className="text-zinc-500 text-sm">Wait for some traffic to see detailed analytics here.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data?.recentVisits?.map((v: any) => {
+                const isSelected = selectedIds.includes(v.id);
+                return (
+                <div 
+                  key={v.id} 
+                  onClick={() => toggleSelection(v.id)}
+                  className={`group flex flex-col md:flex-row md:items-center justify-between p-4 md:p-5 rounded-3xl transition-all duration-300 border cursor-pointer gap-4
+                    ${isSelected 
+                      ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' 
+                      : 'bg-zinc-50 dark:bg-white/5 border-transparent hover:border-zinc-200 dark:hover:border-white/10'
+                    }`}
+                >
+                  
+                  <div className="flex items-center gap-4">
+                    <div className={`text-zinc-400 transition-colors ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`}>
+                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
+                    </div>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${v.device === 'Mobile' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'}`}>
+                      {v.device === 'Mobile' ? <Smartphone size={24} /> : <Monitor size={24} />}
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+                        <LayoutTemplate size={14} className="text-zinc-400" />
+                        {v.path}
+                      </span>
+                      <span className="text-xs text-zinc-500 flex items-center gap-1 mt-1.5 font-medium">
+                        <Clock size={12} />
+                        {new Date(v.visitedAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+  
+                  <div className="flex flex-wrap items-center gap-2 md:gap-3 md:justify-end">
+                    {v.country && (
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
+                        <Globe size={14} className="text-blue-500" />
+                        {v.city && v.city !== 'Unknown' ? `${v.city}, ` : ''}{v.country}
+                      </span>
+                    )}
+                    {(v.browser || v.os) && (
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
+                        {v.browser && v.browser !== 'Unknown' ? v.browser : ''}
+                        {v.browser && v.browser !== 'Unknown' && v.os && v.os !== 'Unknown' ? ' on ' : ''}
+                        {v.os && v.os !== 'Unknown' ? v.os : ''}
+                        {(!v.browser || v.browser === 'Unknown') && (!v.os || v.os === 'Unknown') ? 'Unknown Device' : ''}
+                      </span>
+                    )}
+                  </div>
+  
+                </div>
+              )})}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
