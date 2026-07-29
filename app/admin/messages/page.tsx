@@ -21,6 +21,13 @@ export default function MessagesAdmin() {
 
   useEffect(() => {
     fetchMessages();
+    
+    // Auto-refresh messages every 5 seconds
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 5000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const markAsRead = async (id: string, currentRead: boolean) => {
