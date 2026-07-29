@@ -343,34 +343,27 @@ export default function ProjectsAdmin() {
             
             <form onSubmit={handleSave} className="p-6 md:p-8 space-y-6">
               
-              <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl border border-zinc-200 dark:border-white/5 relative overflow-hidden group">
+              <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-[#111] rounded-2xl border border-zinc-200 dark:border-white/5 relative overflow-hidden group">
                 <div className="relative z-10">
                   <h4 className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
                     Publish Status
                     {formData.published ? (
-                      <span className="flex h-2 w-2 relative">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-blue-500 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full">
+                        <Eye size={12} /> Visible
                       </span>
                     ) : (
-                      <span className="flex h-2 w-2 relative">
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-500"></span>
+                      <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-zinc-500 bg-zinc-200/50 dark:bg-white/10 px-2 py-0.5 rounded-full">
+                        <EyeOff size={12} /> Hidden
                       </span>
                     )}
                   </h4>
                   <p className="text-xs text-zinc-500 mt-1">If unchecked, this project will be saved as a draft and hidden.</p>
                 </div>
                 
-                <button
-                  type="button"
-                  onClick={() => setFormData({...formData, published: !formData.published})}
-                  className="relative inline-flex h-10 w-28 overflow-hidden rounded-xl p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white flex-shrink-0 z-10"
-                >
-                  <span className={`absolute inset-[-1000%] animate-[spin_3s_linear_infinite] ${formData.published ? 'bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]' : 'bg-transparent'}`} />
-                  <span className={`inline-flex h-full w-full cursor-pointer items-center justify-center rounded-xl px-4 py-2 text-xs font-sans font-bold transition-colors ${formData.published ? 'bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200' : 'bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-500 hover:bg-zinc-200 dark:hover:bg-[#222]'}`}>
-                    {formData.published ? 'Published' : 'Draft'}
-                  </span>
-                </button>
+                <label className="relative inline-flex items-center cursor-pointer z-10">
+                  <input type="checkbox" className="sr-only peer" checked={formData.published} onChange={e => setFormData({...formData, published: e.target.checked})} />
+                  <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-500"></div>
+                </label>
               </div>
 
               <div className="space-y-4">
@@ -489,10 +482,13 @@ export default function ProjectsAdmin() {
                 </button>
                 <button 
                   type="submit"
-                  className="relative inline-flex h-10 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white"
+                  disabled={!formData.title || !formData.link}
+                  className={`relative inline-flex h-10 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all ${(!formData.title || !formData.link) ? 'opacity-50 grayscale cursor-not-allowed' : 'hover:scale-[1.02]'}`}
                 >
-                  <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
-                  <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-sans font-medium backdrop-blur-3xl gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-md">
+                  {formData.title && formData.link && (
+                    <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
+                  )}
+                  <span className={`inline-flex h-full w-full items-center justify-center rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black px-6 py-2.5 text-sm font-sans font-medium backdrop-blur-3xl gap-2 transition-colors shadow-md ${(!formData.title || !formData.link) ? '' : 'cursor-pointer hover:bg-zinc-800 dark:hover:bg-zinc-200'}`}>
                     <Save size={16} /> Save Project
                   </span>
                 </button>
