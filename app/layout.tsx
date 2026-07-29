@@ -52,6 +52,9 @@ export async function generateMetadata(): Promise<Metadata> {
       statusBarStyle: "black-translucent",
       capable: true,
     },
+    icons: {
+      apple: '/icon-192x192.png',
+    },
   };
 }
 
