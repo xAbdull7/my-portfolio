@@ -20,23 +20,23 @@ export default function SkillsWidget({ profile }: { profile: any }) {
   return (
     <div 
       onClick={toggleTab}
-      className="md:col-span-3 border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-[#050505] rounded-[24px] p-5 flex flex-col transition-colors duration-300 min-h-[160px] relative overflow-hidden cursor-pointer group"
+      className="md:col-span-3 border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-[#050505] rounded-[24px] p-6 transition-colors duration-300 min-h-[160px] cursor-pointer group grid items-center overflow-hidden"
     >
       
       <div 
-        className="absolute inset-0 p-7 w-full h-full flex flex-col transition-all duration-700 ease-in-out"
+        className="col-start-1 row-start-1 w-full flex flex-col transition-all duration-700 ease-in-out"
         style={{
           opacity: activeTab === 'soft' ? 1 : 0,
           transform: activeTab === 'soft' ? 'translateY(0)' : 'translateY(15px)',
           pointerEvents: activeTab === 'soft' ? 'auto' : 'none'
         }}
       >
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-4">
           <Sparkles size={16} strokeWidth={2} className="text-zinc-700 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
           <h3 className="font-bold font-sans text-[15px] tracking-tight text-zinc-900 dark:text-white">Soft Skills</h3>
         </div>
         
-        <div className="flex flex-col mt-auto">
+        <div className="flex flex-col h-full justify-center">
           {profile?.softSkills?.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {(profile.softSkills || []).map((skill: string) => (
@@ -54,14 +54,14 @@ export default function SkillsWidget({ profile }: { profile: any }) {
       </div>
 
       <div 
-        className="absolute inset-0 p-7 w-full h-full flex flex-col transition-all duration-700 ease-in-out"
+        className="col-start-1 row-start-1 w-full flex flex-col transition-all duration-700 ease-in-out"
         style={{
           opacity: activeTab === 'languages' ? 1 : 0,
           transform: activeTab === 'languages' ? 'translateY(0)' : 'translateY(-15px)',
           pointerEvents: activeTab === 'languages' ? 'auto' : 'none'
         }}
       >
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-2 mb-4">
           <Globe2 size={16} strokeWidth={2} className="text-zinc-700 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors" />
           <h3 className="font-bold font-sans text-[15px] tracking-tight text-zinc-900 dark:text-white">Languages</h3>
         </div>
