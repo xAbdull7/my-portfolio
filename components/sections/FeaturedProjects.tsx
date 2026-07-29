@@ -89,6 +89,7 @@ export default async function FeaturedProjects({ showDrafts = false }: { showDra
               <ExternalLink size={16} strokeWidth={2} className="text-zinc-900 dark:text-zinc-400" /> {project.linkText}
             </a>
           </div>
+        </div>
         );
       })}
     </>
