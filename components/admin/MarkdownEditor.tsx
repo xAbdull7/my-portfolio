@@ -51,11 +51,10 @@ export default function MarkdownEditor({ value, onChange, placeholder = "Write s
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
-            rows={rows}
-            className="w-full p-4 bg-transparent border-none focus:outline-none focus:ring-0 resize-y min-h-[150px] text-zinc-900 dark:text-zinc-200 text-sm font-sans"
+            className="w-full p-4 bg-transparent border-none focus:outline-none focus:ring-0 resize-y min-h-[200px] text-zinc-900 dark:text-zinc-200 text-sm font-sans"
           />
         ) : (
-          <div className="p-4 prose prose-sm dark:prose-invert max-w-none min-h-[150px] overflow-y-auto text-zinc-700 dark:text-zinc-300 font-sans">
+          <div className="p-4 prose prose-sm dark:prose-invert max-w-none min-h-[200px] overflow-y-auto text-zinc-700 dark:text-zinc-300 font-sans">
             {value ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {value}

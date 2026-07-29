@@ -109,14 +109,11 @@ export default function ProjectsAdmin() {
 
   const currentTags = formData.tags ? formData.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
 
-  const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      if (tagInput.trim() && !currentTags.includes(tagInput.trim())) {
-        setFormData({...formData, tags: [...currentTags, tagInput.trim()].join(', ')});
-      }
-      setTagInput('');
+  const commitTag = (value: string) => {
+    if (value.trim() && !currentTags.includes(value.trim())) {
+      setFormData({...formData, tags: [...currentTags, value.trim()].join(', ')});
     }
+    setTagInput('');
   };
 
   const removeTag = (indexToRemove: number) => {
@@ -124,10 +121,11 @@ export default function ProjectsAdmin() {
   };
 
   const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && tagInput === '' && currentTags.length > 0) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      commitTag(tagInput);
+    } else if (e.key === 'Backspace' && tagInput === '' && currentTags.length > 0) {
       removeTag(currentTags.length - 1);
-    } else {
-      addTag(e);
     }
   };
 
@@ -421,7 +419,7 @@ export default function ProjectsAdmin() {
 
                 <div className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Icon Type</label>
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Project Icon <span className="text-xs font-normal text-zinc-400">(appears next to title)</span></label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {[
                         { id: 'library', icon: Library, label: 'Library' },
@@ -464,8 +462,9 @@ export default function ProjectsAdmin() {
                         value={tagInput} 
                         onChange={(e) => setTagInput(e.target.value)}
                         onKeyDown={handleTagInputKeyDown}
+                        onBlur={() => commitTag(tagInput)}
                         className="flex-1 bg-transparent border-none focus:outline-none text-sm min-w-[120px] px-2 py-1 text-zinc-900 dark:text-white"
-                        placeholder={currentTags.length === 0 ? "Type and press Enter..." : ""}
+                        placeholder={currentTags.length === 0 ? "Type and press Enter (or click outside)" : ""}
                       />
                     </div>
                   </div>
