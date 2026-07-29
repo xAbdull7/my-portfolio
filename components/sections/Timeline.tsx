@@ -24,11 +24,11 @@ export default function Timeline({ profile }: { profile: any }) {
         {/* Timeline Container */}
         <div className="relative">
           
-          {/* Mobile Vertical Line */}
-          <div className="absolute left-[19px] top-4 bottom-0 w-[2px] bg-zinc-200 dark:bg-white/10 md:hidden" />
+          {/* Mobile Vertical Line (Fades out at the bottom) */}
+          <div className="absolute left-[19px] top-4 bottom-0 w-[2px] bg-gradient-to-b from-zinc-200 via-zinc-200/50 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent md:hidden" />
           
-          {/* Desktop Horizontal Line */}
-          <div className="hidden md:block absolute top-[19px] left-4 right-0 h-[2px] bg-zinc-200 dark:bg-white/10" />
+          {/* Desktop Horizontal Line (Fades out at the right) */}
+          <div className="hidden md:block absolute top-[19px] left-4 right-0 h-[2px] bg-gradient-to-r from-zinc-200 via-zinc-200/50 to-transparent dark:from-white/10 dark:via-white/5 dark:to-transparent" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-12 relative">
             {timelineItems.map((item: any, index: number) => {
