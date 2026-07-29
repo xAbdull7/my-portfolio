@@ -1,5 +1,5 @@
 'use client';
-import { Mail, Trash2, CheckCircle, ChevronLeft, Reply } from 'lucide-react';
+import { Mail, Trash2, CheckCircle, ChevronLeft } from 'lucide-react';
 import useSWR from 'swr';
 import { useMemo, useState, useEffect } from 'react';
 
@@ -100,7 +100,7 @@ export default function MessagesAdmin() {
 
   if (isLoading && messages.length === 0) {
     return (
-      <div className="flex h-[calc(100vh-8rem)]">
+      <div className="flex h-[calc(100dvh-16rem)] md:h-[calc(100vh-8rem)]">
         <div className="w-full md:w-1/3 border-r border-zinc-200 dark:border-white/10 p-4 space-y-4">
            {[1, 2, 3, 4].map(i => (
              <div key={i} className="h-20 bg-zinc-100 dark:bg-white/5 rounded-2xl animate-pulse"></div>
@@ -115,7 +115,7 @@ export default function MessagesAdmin() {
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-12rem)] bg-white dark:bg-[#050505] rounded-[32px] border border-zinc-200 dark:border-white/10 text-center p-12">
+      <div className="flex flex-col items-center justify-center h-[calc(100dvh-16rem)] md:h-[calc(100vh-12rem)] bg-white dark:bg-[#050505] rounded-3xl md:rounded-[32px] border border-zinc-200 dark:border-white/10 text-center p-12">
         <Mail className="text-zinc-300 dark:text-zinc-700 mb-4" size={48} />
         <h3 className="text-lg font-bold">No messages yet</h3>
         <p className="text-zinc-500 text-sm">When someone contacts you, their messages will appear here.</p>
@@ -124,7 +124,7 @@ export default function MessagesAdmin() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] bg-white dark:bg-[#050505] rounded-[32px] border border-zinc-200 dark:border-white/10 overflow-hidden animate-in fade-in duration-500">
+    <div className="flex h-[calc(100dvh-16rem)] md:h-[calc(100vh-8rem)] bg-white dark:bg-[#050505] rounded-3xl md:rounded-[32px] border border-zinc-200 dark:border-white/10 overflow-hidden animate-in fade-in duration-500">
       
       {/* Left Pane: Conversations List */}
       <div className={`w-full md:w-[360px] flex-col border-r border-zinc-200 dark:border-white/10 ${!isMobileList ? 'hidden md:flex' : 'flex'}`}>
@@ -191,13 +191,7 @@ export default function MessagesAdmin() {
                 >
                   <Trash2 size={18} />
                 </button>
-                <a 
-                  href={`mailto:${activeConversation.email}`}
-                  className="p-2.5 rounded-xl text-blue-500 bg-blue-50 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors md:flex items-center gap-2 hidden"
-                >
-                  <Reply size={18} />
-                  <span className="text-sm font-semibold pr-1">Reply</span>
-                </a>
+
               </div>
             </div>
 
