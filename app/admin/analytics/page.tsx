@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Eye, TrendingUp, Monitor, Smartphone, Globe, Clock, LayoutTemplate, Trash2, CheckSquare, Square, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import GeoMap from './components/GeoMap';
 
 export default function AnalyticsAdmin() {
   const [data, setData] = useState<any>(null);
@@ -238,16 +239,11 @@ export default function AnalyticsAdmin() {
             <Globe className="text-zinc-400" /> Geographic Distribution
           </h3>
           <div className="space-y-4">
-             {data?.geoDistribution && data.geoDistribution.length > 0 ? data.geoDistribution.map((geo: any, i: number) => (
-               <div key={geo.country} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
-                 <div className="flex items-center gap-3">
-                   <span className="font-semibold text-sm flex items-center gap-2">
-                      <Globe size={16} className="text-zinc-400"/> {geo.country}
-                   </span>
-                 </div>
-                 <div className="font-black text-lg">{geo.count}</div>
-               </div>
-             )) : (
+             {data?.geoDistribution && data.geoDistribution.length > 0 ? (
+                <div className="w-full h-full min-h-[300px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center">
+                   <GeoMap data={data.geoDistribution} />
+                </div>
+             ) : (
                <p className="text-zinc-500 text-sm">No location data available.</p>
              )}
           </div>
