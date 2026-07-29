@@ -2,15 +2,43 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 
+import { UAParser } from 'ua-parser-js';
+import crypto from 'crypto';
+
 // POST: Public endpoint to log a page visit
 export async function POST(req: Request) {
   try {
     const data = await req.json();
     
-    // Ignore dev visits or bot paths if necessary, but keep it simple for MVP
+    // Extract headers for advanced analytics
+    const userAgent = req.headers.get('user-agent') || '';
+    const parser = new UAParser(userAgent);
+    const browser = parser.getBrowser().name || 'Unknown';
+    const os = parser.getOS().name || 'Unknown';
+    const deviceType = parser.getDevice().type || (os === 'iOS' || os === 'Android' ? 'Mobile' : 'Desktop');
+    
+    // Vercel specific geo headers
+    const country = req.headers.get('x-vercel-ip-country') || 'Unknown';
+    const city = req.headers.get('x-vercel-ip-city') || 'Unknown';
+    
+    // Create a simple hash of IP to track unique visitors without storing raw IPs
+    const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+    const ipHash = crypto.createHash('sha256').update(ip).digest('hex').substring(0, 16);
+    
+    // Ignore bots
+    if (userAgent.toLowerCase().includes('bot')) {
+       return NextResponse.json({ success: true, ignored: true });
+    }
+
     await prisma.pageVisit.create({
       data: {
         path: data.path || '/',
+        browser,
+        os,
+        device: deviceType.charAt(0).toUpperCase() + deviceType.slice(1),
+        country,
+        city,
+        ipHash
       }
     });
 
