@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'Admin',
     description: 'Admin Dashboard for Portfolio',
     start_url: '/admin',
-    display: 'standalone',
+    display: 'fullscreen',
     background_color: '#000000',
     theme_color: '#000000',
     icons: [

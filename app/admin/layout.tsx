@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Home, Folder, User, Code2, LogOut, MessageSquare, BarChart3 } from 'lucide-react';
 import { getServerSession } from 'next-auth';
+import NotificationToggle from './components/NotificationToggle';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession();
@@ -22,9 +23,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div>
           <h2 className="text-lg font-bold tracking-tight">Admin</h2>
         </div>
-        <Link href="/" className="p-2 bg-zinc-100 dark:bg-white/5 rounded-full text-zinc-600 dark:text-zinc-400">
-          <Home size={18} />
-        </Link>
+        <div className="flex items-center gap-2">
+          <NotificationToggle />
+          <Link href="/" className="p-2 bg-zinc-100 dark:bg-white/5 rounded-full text-zinc-600 dark:text-zinc-400">
+            <Home size={18} />
+          </Link>
+        </div>
       </div>
 
       {/* Desktop Sidebar */}
@@ -43,6 +47,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </nav>
         
         <div className="mt-auto pt-6 border-t border-zinc-200 dark:border-white/5 flex flex-col gap-2">
+          <NotificationToggle />
           <Link href="/" className="px-4 py-3 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors font-medium text-sm flex items-center gap-3 text-zinc-600 dark:text-zinc-400">
             <Home size={18} /> Back to Site
           </Link>
