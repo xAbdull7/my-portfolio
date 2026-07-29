@@ -84,6 +84,8 @@ export default function AnalyticsAdmin() {
 
   const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
+  const formatPath = (p: string) => p === '/' ? 'Home Page' : p;
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -240,7 +242,7 @@ export default function AnalyticsAdmin() {
                <div key={page.path} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
                  <div className="flex items-center gap-3">
                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">{i + 1}</div>
-                   <span className="font-semibold text-sm truncate max-w-[150px]">{page.path}</span>
+                   <span className="font-semibold text-sm truncate max-w-[150px]">{formatPath(page.path)}</span>
                  </div>
                  <div className="font-black text-lg">{page.count}</div>
                </div>
@@ -313,7 +315,7 @@ export default function AnalyticsAdmin() {
                     <div className="flex flex-col">
                       <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
                         <LayoutTemplate size={14} className="text-zinc-400" />
-                        {v.path}
+                        {formatPath(v.path)}
                       </span>
                       <span className="text-xs text-zinc-500 flex items-center gap-1 mt-1.5 font-medium">
                         <Clock size={12} />
