@@ -7,6 +7,14 @@ import NotificationToggle from './components/NotificationToggle';
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession();
 
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-white flex items-center justify-center p-4 w-full">
+        {children}
+      </div>
+    );
+  }
+
   const navLinks = [
     { href: '/admin/projects', icon: Folder, label: 'Projects' },
     { href: '/admin/profile', icon: User, label: 'Profile' },
