@@ -20,9 +20,12 @@ export default async function FeaturedProjects({ showDrafts = false }: { showDra
 
   return (
     <>
-      {featuredProjects.map((project: any, index: number) => (
-        <div key={project.id} className="flex flex-col p-7 border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-[#050505] rounded-[24px] min-h-[380px] transition-colors duration-300">
-          <div>
+      {featuredProjects.map((project: any, index: number) => {
+        const isLastOdd = featuredProjects.length % 2 !== 0 && index === featuredProjects.length - 1;
+        
+        return (
+          <div key={project.id} className={`flex flex-col p-7 border border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-[#050505] rounded-[24px] min-h-[380px] transition-colors duration-300 ${isLastOdd ? 'md:col-span-2' : ''}`}>
+            <div>
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-3">
                 {/* For Kaggle, there's no white bg square. So we render it conditionally based on icon type */}
@@ -86,8 +89,8 @@ export default async function FeaturedProjects({ showDrafts = false }: { showDra
               <ExternalLink size={16} strokeWidth={2} className="text-zinc-900 dark:text-zinc-400" /> {project.linkText}
             </a>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }
