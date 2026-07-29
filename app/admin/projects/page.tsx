@@ -44,7 +44,7 @@ function SortableProjectRow({ project, onEdit, onDelete }: { project: any, onEdi
       </div>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
-          <h3 className="font-bold text-sm md:text-base text-zinc-900 dark:text-white flex items-center gap-2 truncate">
+          <h3 className="font-bold text-sm md:text-base text-zinc-900 dark:text-white flex items-center gap-2 truncate max-w-[150px] sm:max-w-xs">
             {project.title}
             {!project.published && (
               <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
@@ -53,12 +53,12 @@ function SortableProjectRow({ project, onEdit, onDelete }: { project: any, onEdi
             )}
           </h3>
           {project.badge && (
-            <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 shrink-0">
+            <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 shrink-0 truncate max-w-[80px]">
               {project.badge}
             </span>
           )}
         </div>
-        <p className="text-xs md:text-sm text-zinc-500 line-clamp-1 max-w-xl">{project.description}</p>
+        <p className="text-xs md:text-sm text-zinc-500 line-clamp-1 max-w-xl break-words">{project.description}</p>
         {project.tags && project.tags.length > 0 && (
           <div className="flex gap-2 mt-2 md:mt-3 flex-wrap">
             {project.tags.slice(0, 2).map((tag: string, i: number) => (
@@ -281,7 +281,7 @@ export default function ProjectsAdmin() {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#050505] rounded-[32px] border border-zinc-200 dark:border-white/10 overflow-hidden shadow-sm">
+      <div className="bg-white dark:bg-[#050505] rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm overflow-hidden w-full max-w-full">
         {loading ? (
           <div className="p-12 text-center text-zinc-500 flex flex-col items-center justify-center gap-4">
             <div className="w-6 h-6 border-2 border-zinc-900 dark:border-white border-t-transparent rounded-full animate-spin"></div>

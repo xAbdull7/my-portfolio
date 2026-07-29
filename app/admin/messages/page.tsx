@@ -76,10 +76,10 @@ export default function MessagesAdmin() {
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg text-zinc-900 dark:text-white">{msg.name}</h3>
-                    {!msg.read && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                    <h3 className="font-bold text-lg text-zinc-900 dark:text-white truncate max-w-[200px] sm:max-w-xs">{msg.name}</h3>
+                    {!msg.read && <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>}
                   </div>
-                  <a href={`mailto:${msg.email}`} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">{msg.email}</a>
+                  <a href={`mailto:${msg.email}`} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline break-all">{msg.email}</a>
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-zinc-500 flex items-center gap-1">
@@ -103,9 +103,9 @@ export default function MessagesAdmin() {
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed bg-zinc-50 dark:bg-white/[0.02] p-4 rounded-2xl">
+              <div className="text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap text-sm leading-relaxed bg-zinc-50 dark:bg-white/5 p-4 rounded-2xl break-words">
                 {msg.message}
-              </p>
+              </div>
             </div>
           ))
         )}

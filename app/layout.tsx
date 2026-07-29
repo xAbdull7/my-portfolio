@@ -47,8 +47,20 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
     },
+    appleWebApp: {
+      title: "Admin",
+      statusBarStyle: "black-translucent",
+      capable: true,
+    },
   };
 }
+
+export const viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 // ده الروت الأساسي للموقع اللي بيحتوي على كل حاجة
 export default function RootLayout({

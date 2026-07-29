@@ -104,7 +104,7 @@ export default function ProfileAdmin() {
       <form onSubmit={handleSave} className="space-y-6">
         
         {/* Basic Info */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <User className="text-zinc-400" /> Basic Information
           </div>
@@ -125,7 +125,7 @@ export default function ProfileAdmin() {
         </div>
 
         {/* Links */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <LinkIcon className="text-zinc-400" /> Connect Links
           </div>
@@ -154,7 +154,7 @@ export default function ProfileAdmin() {
         </div>
 
         {/* Education */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <BookOpen className="text-zinc-400" /> Education
           </div>
@@ -175,7 +175,7 @@ export default function ProfileAdmin() {
         </div>
 
         {/* Skills */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <Brain className="text-zinc-400" /> Soft Skills & Languages
           </div>
@@ -240,7 +240,7 @@ export default function ProfileAdmin() {
         </div>
 
         {/* Timeline Management */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <BookOpen className="text-zinc-400" /> Experience & Education Timeline
           </div>

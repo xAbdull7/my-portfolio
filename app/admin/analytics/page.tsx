@@ -138,7 +138,7 @@ export default function AnalyticsAdmin() {
       )}
 
       {/* Live Visitors Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] p-6 md:p-8 flex items-center justify-between shadow-lg shadow-blue-500/20 text-white animate-in zoom-in-95 duration-500">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] p-6 md:p-8 flex items-center justify-between shadow-lg shadow-blue-500/20 text-white animate-in zoom-in-95 duration-500 overflow-hidden w-full max-w-full">
         <div className="flex items-center gap-4">
           <div className="relative flex h-5 w-5">
             {liveCount > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>}
@@ -154,7 +154,7 @@ export default function AnalyticsAdmin() {
 
       {/* Top Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-blue-500/50 transition-colors">
+        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-blue-500/50 transition-colors overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
               <Eye size={20} />
@@ -164,7 +164,7 @@ export default function AnalyticsAdmin() {
           <div className="text-5xl font-black tracking-tight">{data?.totalVisits || 0}</div>
         </div>
 
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-purple-500/50 transition-colors">
+        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-purple-500/50 transition-colors overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
               <Users size={20} />
@@ -174,7 +174,7 @@ export default function AnalyticsAdmin() {
           <div className="text-5xl font-black tracking-tight">{data?.uniqueVisitors || 0}</div>
         </div>
 
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-green-500/50 transition-colors">
+        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-green-500/50 transition-colors overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
               <TrendingUp size={20} />
@@ -186,7 +186,7 @@ export default function AnalyticsAdmin() {
       </div>
 
       {/* Geographic Distribution - Full Width */}
-      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm">
+      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm overflow-hidden w-full max-w-full">
          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <Globe className="text-zinc-400" /> Geographic Distribution
         </h3>
@@ -204,7 +204,7 @@ export default function AnalyticsAdmin() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 7 Day Trend */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 flex flex-col h-full">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 flex flex-col h-full overflow-hidden w-full max-w-full">
            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <TrendingUp className="text-zinc-400" /> 7-Day Traffic Trend
           </h3>
@@ -227,7 +227,7 @@ export default function AnalyticsAdmin() {
         </div>
 
         {/* Device Distribution */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col h-full">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col h-full overflow-hidden w-full max-w-full">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <Monitor className="text-zinc-400" /> Device Split
           </h3>
@@ -263,7 +263,7 @@ export default function AnalyticsAdmin() {
       </div>
 
       {/* Annual Activity Heatmap */}
-      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm w-full overflow-x-auto">
+      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm w-full max-w-full overflow-hidden overflow-x-auto">
         <h3 className="text-lg font-bold mb-6 flex items-center gap-2 min-w-max">
           <TrendingUp className="text-zinc-400" /> Annual Activity
         </h3>
@@ -295,7 +295,7 @@ export default function AnalyticsAdmin() {
 
       {/* Top Browsers and Recent Visits */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-1 h-fit">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-1 h-fit overflow-hidden w-full max-w-full">
            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
             <Globe className="text-zinc-400" /> Top Browsers
           </h3>
@@ -315,7 +315,7 @@ export default function AnalyticsAdmin() {
         </div>
 
         {/* Recent Visits Log */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2">
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 overflow-hidden w-full max-w-full">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <h3 className="text-xl font-bold flex items-center gap-3">
               <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl">

@@ -73,7 +73,7 @@ export default function TechStackAdmin() {
         <p className="text-zinc-500 text-sm">Update the technologies you work with. Separate tags with commas.</p>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+      <form onSubmit={handleSave} className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6 overflow-hidden w-full max-w-full">
         <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
           <Code2 className="text-zinc-400" /> Technology Categories
         </div>
