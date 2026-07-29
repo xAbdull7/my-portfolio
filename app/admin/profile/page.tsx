@@ -252,13 +252,14 @@ export default function ProfileAdmin() {
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <BookOpen className="text-zinc-400" /> Experience & Education Timeline
           </div>
-          <Reorder.Group axis="y" values={formData.timeline} onReorder={(newOrder) => setFormData({...formData, timeline: newOrder})} className="space-y-4">
-            {formData.timeline.map((item, index) => (
-              <Reorder.Item 
-                key={item.id} 
-                value={item} 
-                className="p-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-white/10 rounded-2xl space-y-4 relative group cursor-grab active:cursor-grabbing"
-              >
+          <div className="space-y-4">
+            <Reorder.Group axis="y" values={formData.timeline} onReorder={(newOrder) => setFormData({...formData, timeline: newOrder})} className="space-y-4">
+              {formData.timeline.map((item, index) => (
+                <Reorder.Item 
+                  key={item.id} 
+                  value={item} 
+                  className="p-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-white/10 rounded-2xl space-y-4 relative group cursor-grab active:cursor-grabbing"
+                >
                 <div className="absolute top-4 left-4 p-2 text-zinc-400 opacity-50 hover:text-zinc-900 dark:hover:text-white transition-colors z-10" title="Drag to reorder">
                   <GripVertical size={16} />
                 </div>
