@@ -21,7 +21,7 @@ export async function POST(req: Request) {
       }
     });
 
-    if (recentMessages >= 3) {
+    if (recentMessages >= 10) {
       return NextResponse.json({ error: 'لقد أرسلت الكثير من الرسائل. يرجى المحاولة مرة أخرى لاحقاً.' }, { status: 429 });
     }
 

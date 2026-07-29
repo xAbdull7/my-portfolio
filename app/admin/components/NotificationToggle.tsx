@@ -51,13 +51,17 @@ export default function NotificationToggle() {
           applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
         });
 
-        await fetch('/api/notifications/subscribe', {
+        const res = await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subscription)
         });
 
-        setIsSubscribed(true);
+        if (res.ok) {
+          setIsSubscribed(true);
+        } else {
+          throw new Error('Failed to save subscription on server');
+        }
       }
     } catch (error) {
       console.error('Subscription error:', error);
@@ -74,7 +78,7 @@ export default function NotificationToggle() {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
           await subscription.unsubscribe();
-          await fetch('/api/notifications/unsubscribe', {
+          await fetch('/api/push/unsubscribe', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ endpoint: subscription.endpoint })
