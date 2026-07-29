@@ -12,9 +12,11 @@ export default function NotificationToggle() {
       setPermission(Notification.permission);
       
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.pushManager.getSubscription().then(subscription => {
-            setIsSubscribed(!!subscription);
+        navigator.serviceWorker.register('/sw.js').then(() => {
+          navigator.serviceWorker.ready.then(registration => {
+            registration.pushManager.getSubscription().then(subscription => {
+              setIsSubscribed(!!subscription);
+            });
           });
         });
       }
@@ -36,47 +38,55 @@ export default function NotificationToggle() {
     return outputArray;
   };
 
-  const subscribeUser = async () => {
-    setLoading(true);
+  const handleSubscribe = async () => {
     try {
-      const permissionResult = await Notification.requestPermission();
-      setPermission(permissionResult);
+      setLoading(true);
+      const permission = await Notification.requestPermission();
+      setPermission(permission);
 
-      if (permissionResult !== 'granted') {
-        alert('يرجى السماح بالإشعارات من إعدادات المتصفح');
-        setLoading(false);
-        return;
+      if (permission === 'granted' && 'serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
+        });
+
+        await fetch('/api/notifications/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subscription)
+        });
+
+        setIsSubscribed(true);
       }
-
-      const registration = await navigator.serviceWorker.ready;
-      
-      const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-      
-      if (!publicVapidKey) {
-        alert('مفاتيح VAPID غير موجودة، اتصل بالمطور.');
-        setLoading(false);
-        return;
-      }
-
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-      });
-
-      await fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(subscription),
-      });
-
-      setIsSubscribed(true);
-    } catch (err) {
-      console.error('Failed to subscribe to push notifications:', err);
-      alert('حدث خطأ أثناء تفعيل الإشعارات');
+    } catch (error) {
+      console.error('Subscription error:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  };
+
+  const handleUnsubscribe = async () => {
+    try {
+      setLoading(true);
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) {
+          await subscription.unsubscribe();
+          await fetch('/api/notifications/unsubscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ endpoint: subscription.endpoint })
+          });
+        }
+      }
+      setIsSubscribed(false);
+    } catch (error) {
+      console.error('Unsubscribe error:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (typeof window === 'undefined' || !('Notification' in window) || !('serviceWorker' in navigator)) {
@@ -85,19 +95,19 @@ export default function NotificationToggle() {
 
   return (
     <button 
-      onClick={!isSubscribed ? subscribeUser : undefined}
-      disabled={isSubscribed || loading}
-      className={`p-3 md:px-4 md:py-2.5 rounded-2xl md:rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-sm
+      onClick={!isSubscribed ? handleSubscribe : handleUnsubscribe}
+      disabled={loading}
+      className={`p-3 md:px-4 md:py-2.5 rounded-2xl md:rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-sm hover:scale-105 active:scale-95 cursor-pointer
         ${isSubscribed 
-          ? 'bg-zinc-100 dark:bg-white/5 text-green-600 dark:text-green-400 cursor-default' 
-          : 'bg-zinc-900 text-white dark:bg-white dark:text-black hover:scale-105 active:scale-95'
-        } ${loading ? 'opacity-50' : ''}`}
-      title={isSubscribed ? "الإشعارات مفعلة" : "تفعيل الإشعارات"}
+          ? 'bg-zinc-100 dark:bg-white/5 text-green-600 dark:text-green-400' 
+          : 'bg-zinc-900 text-white dark:bg-white dark:text-black'
+        } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+      title={isSubscribed ? "إلغاء الإشعارات" : "تفعيل الإشعارات"}
     >
       {isSubscribed ? (
         <>
-          <BellRing size={18} className="animate-pulse" /> 
-          <span className="hidden md:inline">الإشعارات مفعلة</span>
+          <BellOff size={18} /> 
+          <span className="hidden md:inline">{loading ? 'جاري الإلغاء...' : 'إلغاء الإشعارات'}</span>
         </>
       ) : (
         <>
