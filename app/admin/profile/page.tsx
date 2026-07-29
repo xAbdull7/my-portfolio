@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Save, User, Link as LinkIcon, Music, BookOpen, Brain, Globe } from 'lucide-react';
+import { Save, User, Link as LinkIcon, Music, BookOpen, Brain, Globe, Trash2 } from 'lucide-react';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 export default function ProfileAdmin() {
