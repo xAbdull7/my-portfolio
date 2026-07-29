@@ -5,6 +5,10 @@ self.addEventListener('push', function (event) {
       const title = data.title || 'New Message';
       const options = {
         body: data.body || 'You have a new message from your portfolio.',
+        icon: data.icon,
+        badge: data.badge,
+        vibrate: data.vibrate,
+        requireInteraction: data.requireInteraction,
         data: {
           url: data.url || '/admin/messages'
         }

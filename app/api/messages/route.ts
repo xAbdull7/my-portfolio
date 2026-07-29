@@ -53,8 +53,12 @@ export async function POST(req: Request) {
         const subscriptions = await prisma.pushSubscription.findMany();
         
         const payload = JSON.stringify({
-          title: 'رسالة جديدة من محفظتك!',
-          body: `من: ${data.name}\n${data.message.substring(0, 50)}...`,
+          title: `📩 رسالة جديدة من: ${data.name}`,
+          body: `"${data.message.substring(0, 70)}..."`,
+          icon: '/icon-192x192.png',
+          badge: '/icon.svg',
+          vibrate: [200, 100, 200],
+          requireInteraction: true,
           url: '/admin/messages'
         });
 
