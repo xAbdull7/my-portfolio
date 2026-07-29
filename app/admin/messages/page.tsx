@@ -66,7 +66,7 @@ export default function MessagesAdmin() {
             <p className="text-zinc-500 text-sm">When someone contacts you, their messages will appear here.</p>
           </div>
         ) : (
-          messages.map(msg => (
+          messages.map((msg: any) => (
             <div key={msg.id} className={`bg-white dark:bg-[#050505] p-6 rounded-[24px] border transition-colors ${msg.read ? 'border-zinc-200 dark:border-white/5 opacity-80' : 'border-zinc-300 dark:border-white/20 shadow-md'}`}>
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
                 <div>
