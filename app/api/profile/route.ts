@@ -36,6 +36,7 @@ export async function PUT(req: Request) {
         eduMajor: data.eduMajor,
         eduUni: data.eduUni,
         eduYear: data.eduYear,
+        timeline: data.timeline,
         spotifyPlaylist: data.spotifyPlaylist,
         spotifySong: data.spotifySong,
         spotifyExplicit: data.spotifyExplicit,

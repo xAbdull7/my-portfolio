@@ -44,6 +44,8 @@ model Profile {
   eduMajor    String?
   eduUni      String?
   eduYear     String?
+  
+  timeline    Json?
 
   spotifyPlaylist String?
   spotifySong     String?

@@ -3,7 +3,7 @@ import Header from '@/components/sections/Header';
 import FeaturedProjects from '@/components/sections/FeaturedProjects';
 import TechStack from '@/components/sections/TechStack';
 import SkillsWidget from '@/components/sections/SkillsWidget';
-import Education from '@/components/sections/Education';
+import Timeline from '@/components/sections/Timeline';
 import GithubWidget from '@/components/sections/GithubWidget';
 import Footer from '@/components/sections/Footer';
 
@@ -47,8 +47,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
           <TechStack />
           <GithubWidget />
           <SkillsWidget profile={profile} />
-          <Education profile={profile} />
         </div>
+        
+        {/* Experience & Education Timeline */}
+        <Timeline profile={profile} />
 
         {/* الفوتر اللي فيه أزرار السوشيال ميديا */}
         <Footer profile={profile} />

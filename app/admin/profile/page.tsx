@@ -11,6 +11,7 @@ export default function ProfileAdmin() {
     resumeUrl: '', githubUrl: '', linkedinUrl: '', twitterUrl: '', emailUrl: '',
     eduMajor: '', eduUni: '', eduYear: '',
     softSkills: '', languages: [] as {name: string, level: string}[],
+    timeline: [] as any[],
     seoTitle: '', seoDescription: '', seoKeywords: ''
   });
 
@@ -33,6 +34,7 @@ export default function ProfileAdmin() {
               eduMajor: data.eduMajor || '',
               eduUni: data.eduUni || '',
               eduYear: data.eduYear || '',
+              timeline: data.timeline && Array.isArray(data.timeline) ? data.timeline : [],
               softSkills: data.softSkills ? data.softSkills.join(', ') : '',
               languages: data.languages && Array.isArray(data.languages) ? data.languages.map((l: any) => {
                 if (typeof l === 'string') {
@@ -234,6 +236,109 @@ export default function ProfileAdmin() {
                 + Add Language
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Timeline Management */}
+        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm space-y-6">
+          <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
+            <BookOpen className="text-zinc-400" /> Experience & Education Timeline
+          </div>
+          <div className="space-y-4">
+            {formData.timeline.map((item, index) => (
+              <div key={index} className="p-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-white/10 rounded-2xl space-y-4 relative group">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const newTimeline = formData.timeline.filter((_, i) => i !== index);
+                    setFormData({...formData, timeline: newTimeline});
+                  }}
+                  className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                  title="Remove Item"
+                >
+                  <Trash2 size={16} />
+                </button>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-10">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Type</label>
+                    <select 
+                      value={item.type}
+                      onChange={(e) => {
+                        const newTimeline = [...formData.timeline];
+                        newTimeline[index].type = e.target.value;
+                        setFormData({...formData, timeline: newTimeline});
+                      }}
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer"
+                    >
+                      <option value="experience">Experience</option>
+                      <option value="education">Education</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Date / Year</label>
+                    <input 
+                      value={item.date} 
+                      onChange={(e) => {
+                        const newTimeline = [...formData.timeline];
+                        newTimeline[index].date = e.target.value;
+                        setFormData({...formData, timeline: newTimeline});
+                      }}
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
+                      placeholder="e.g. 2023 - Present"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Title</label>
+                    <input 
+                      value={item.title} 
+                      onChange={(e) => {
+                        const newTimeline = [...formData.timeline];
+                        newTimeline[index].title = e.target.value;
+                        setFormData({...formData, timeline: newTimeline});
+                      }}
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
+                      placeholder="e.g. Senior Frontend Developer"
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Subtitle (Company / University)</label>
+                    <input 
+                      value={item.subtitle} 
+                      onChange={(e) => {
+                        const newTimeline = [...formData.timeline];
+                        newTimeline[index].subtitle = e.target.value;
+                        setFormData({...formData, timeline: newTimeline});
+                      }}
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
+                      placeholder="e.g. Apple Inc."
+                    />
+                  </div>
+                  <div className="space-y-1.5 md:col-span-2">
+                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
+                    <textarea 
+                      rows={3}
+                      value={item.description} 
+                      onChange={(e) => {
+                        const newTimeline = [...formData.timeline];
+                        newTimeline[index].description = e.target.value;
+                        setFormData({...formData, timeline: newTimeline});
+                      }}
+                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm resize-none"
+                      placeholder="e.g. Led the migration to Next.js..."
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            <button 
+              type="button"
+              onClick={() => setFormData({...formData, timeline: [...formData.timeline, { type: 'experience', title: '', subtitle: '', date: '', description: '' }]})}
+              className="text-sm font-semibold text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/10 px-5 py-2.5 rounded-full hover:bg-zinc-200 dark:hover:bg-white/20 transition-colors mt-2"
+            >
+              + Add Timeline Item
+            </button>
           </div>
         </div>
 
