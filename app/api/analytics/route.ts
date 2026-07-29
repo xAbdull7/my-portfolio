@@ -19,7 +19,8 @@ export async function POST(req: Request) {
     
     // Vercel specific geo headers
     const country = req.headers.get('x-vercel-ip-country') || 'Unknown';
-    const city = req.headers.get('x-vercel-ip-city') || 'Unknown';
+    const cityHeader = req.headers.get('x-vercel-ip-city');
+    const city = cityHeader ? decodeURIComponent(cityHeader) : 'Unknown';
     
     // Create a simple hash of IP to track unique visitors without storing raw IPs
     const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
