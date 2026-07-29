@@ -253,13 +253,13 @@ export default function ProfileAdmin() {
                     const newTimeline = formData.timeline.filter((_, i) => i !== index);
                     setFormData({...formData, timeline: newTimeline});
                   }}
-                  className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors opacity-0 group-hover:opacity-100"
+                  className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
                   title="Remove Item"
                 >
                   <Trash2 size={16} />
                 </button>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-0 md:pr-10 pt-8 md:pt-0">
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Type</label>
                     <select 

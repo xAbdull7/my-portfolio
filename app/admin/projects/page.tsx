@@ -38,37 +38,37 @@ function SortableProjectRow({ project, onEdit, onDelete }: { project: any, onEdi
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={`grid grid-cols-[auto_1fr_auto] gap-4 p-6 items-center transition-colors group ${isDragging ? 'bg-zinc-100 dark:bg-white/10 shadow-lg scale-[1.01]' : 'bg-transparent hover:bg-zinc-50 dark:hover:bg-white/5'}`}>
-      <div {...attributes} {...listeners} className="w-8 cursor-grab active:cursor-grabbing text-zinc-300 dark:text-zinc-700 hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center">
+    <div ref={setNodeRef} style={style} className={`grid grid-cols-[auto_1fr_auto] gap-3 md:gap-4 p-4 md:p-6 items-center transition-colors group ${isDragging ? 'bg-zinc-100 dark:bg-white/10 shadow-lg scale-[1.01]' : 'bg-transparent hover:bg-zinc-50 dark:hover:bg-white/5'}`}>
+      <div {...attributes} {...listeners} className="w-6 md:w-8 cursor-grab active:cursor-grabbing text-zinc-300 dark:text-zinc-700 hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center">
         <GripVertical size={18} />
       </div>
-      <div>
-        <div className="flex items-center gap-3 mb-1">
-          <h3 className="font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
+          <h3 className="font-bold text-sm md:text-base text-zinc-900 dark:text-white flex items-center gap-2 truncate">
             {project.title}
             {!project.published && (
-              <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shrink-0">
                 <EyeOff size={10} /> Draft
               </span>
             )}
           </h3>
           {project.badge && (
-            <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-[10px] font-medium text-zinc-600 dark:text-zinc-300">
+            <span className="px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-white/10 text-[10px] font-medium text-zinc-600 dark:text-zinc-300 shrink-0">
               {project.badge}
             </span>
           )}
         </div>
-        <p className="text-sm text-zinc-500 line-clamp-1 max-w-xl">{project.description}</p>
+        <p className="text-xs md:text-sm text-zinc-500 line-clamp-1 max-w-xl">{project.description}</p>
         {project.tags && project.tags.length > 0 && (
-          <div className="flex gap-2 mt-3">
-            {project.tags.slice(0, 3).map((tag: string, i: number) => (
-              <span key={i} className="text-xs text-zinc-400 dark:text-zinc-500">#{tag}</span>
+          <div className="flex gap-2 mt-2 md:mt-3 flex-wrap">
+            {project.tags.slice(0, 2).map((tag: string, i: number) => (
+              <span key={i} className="text-[10px] md:text-xs text-zinc-400 dark:text-zinc-500">#{tag}</span>
             ))}
-            {project.tags.length > 3 && <span className="text-xs text-zinc-400 dark:text-zinc-500">+{project.tags.length - 3}</span>}
+            {project.tags.length > 2 && <span className="text-[10px] md:text-xs text-zinc-400 dark:text-zinc-500">+{project.tags.length - 2}</span>}
           </div>
         )}
       </div>
-      <div className="flex items-center gap-2 pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1 md:gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-col md:flex-row">
         {!project.published && (
           <a href={`/?preview=true#projects`} target="_blank" rel="noreferrer" title="Preview Draft" className="p-2 text-zinc-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-colors">
             <ExternalLink size={16} />
@@ -297,7 +297,7 @@ export default function ProjectsAdmin() {
           </div>
         ) : (
           <div className="flex flex-col">
-            <div className="grid grid-cols-[auto_1fr_auto] gap-4 p-6 border-b border-zinc-100 dark:border-white/5 text-xs font-medium text-zinc-400 uppercase tracking-wider">
+            <div className="hidden md:grid grid-cols-[auto_1fr_auto] gap-4 p-6 border-b border-zinc-100 dark:border-white/5 text-xs font-medium text-zinc-400 uppercase tracking-wider">
               <div className="w-8"></div>
               <div>Project Details</div>
               <div className="pr-4">Actions</div>
@@ -330,10 +330,10 @@ export default function ProjectsAdmin() {
 
       {/* Modal Overlay */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#0a0a0a] rounded-[32px] w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-zinc-200 dark:border-white/10 shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="sticky top-0 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-100 dark:border-white/10 p-6 flex justify-between items-center z-10">
-              <h2 className="text-xl font-bold">{editingProject ? 'Edit Project' : 'Add New Project'}</h2>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 md:p-4 sm:p-6 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#0a0a0a] rounded-t-[32px] md:rounded-[32px] w-full max-w-2xl h-[90vh] md:h-auto md:max-h-[90vh] overflow-y-auto border border-zinc-200 dark:border-white/10 shadow-2xl animate-in slide-in-from-bottom-full md:zoom-in-95 duration-200 mt-auto md:mt-0">
+            <div className="sticky top-0 bg-white/80 dark:bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-zinc-100 dark:border-white/10 p-4 md:p-6 flex justify-between items-center z-10">
+              <h2 className="text-lg md:text-xl font-bold">{editingProject ? 'Edit Project' : 'Add New Project'}</h2>
               <button onClick={closeModal} className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 transition-colors">
                 <X size={20} />
               </button>
