@@ -87,3 +87,12 @@ model PageVisit {
   city      String?
   ipHash    String?
 }
+
+model LiveVisitor {
+  id          String   @id @default(cuid())
+  ipHash      String   @unique
+  country     String?
+  city        String?
+  path        String
+  lastActive  DateTime @default(now())
+}

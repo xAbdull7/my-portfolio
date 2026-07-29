@@ -125,6 +125,35 @@ export async function GET() {
       };
     });
 
+    // Heatmap Data (Last 365 Days)
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    
+    // Group visits by date for the heatmap
+    // In a real app we might use Prisma groupBy, but since SQLite/Postgres vary, 
+    // and visits aren't expected to be in the millions for a portfolio, we process in memory
+    const heatmapCounts: Record<string, number> = {};
+    const recentYearVisits = visits.filter(v => new Date(v.visitedAt) >= oneYearAgo);
+    
+    recentYearVisits.forEach(v => {
+      const dateStr = new Date(v.visitedAt).toISOString().split('T')[0];
+      heatmapCounts[dateStr] = (heatmapCounts[dateStr] || 0) + 1;
+    });
+
+    // Format for react-activity-calendar
+    // Generate an array of all dates in the last year to ensure full coverage
+    const heatmapData = [];
+    for (let d = new Date(oneYearAgo); d <= today; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      const count = heatmapCounts[dateStr] || 0;
+      let level = 0;
+      if (count > 0) level = 1;
+      if (count > 5) level = 2;
+      if (count > 15) level = 3;
+      if (count > 30) level = 4;
+      heatmapData.push({ date: dateStr, count, level });
+    }
+
     return NextResponse.json({
       totalVisits,
       uniqueVisitors,
@@ -134,6 +163,7 @@ export async function GET() {
       deviceDistribution,
       browserDistribution,
       chartData,
+      heatmapData,
       recentVisits: visits.slice(0, 100)
     });
   } catch (error: any) {

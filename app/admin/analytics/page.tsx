@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Eye, TrendingUp, Monitor, Smartphone, Globe, Clock, LayoutTemplate, Trash2, CheckSquare, Square, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { ActivityCalendar } from 'react-activity-calendar';
 import GeoMap from './components/GeoMap';
 
 export default function AnalyticsAdmin() {
@@ -10,6 +11,7 @@ export default function AnalyticsAdmin() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [liveCount, setLiveCount] = useState(0);
 
   const fetchAnalytics = async () => {
     try {
@@ -26,6 +28,20 @@ export default function AnalyticsAdmin() {
 
   useEffect(() => {
     fetchAnalytics();
+    
+    // Poll for live visitors every 10 seconds
+    const fetchLive = async () => {
+      try {
+        const res = await fetch('/api/analytics/live');
+        if (res.ok) {
+          const liveData = await res.json();
+          setLiveCount(liveData.count || 0);
+        }
+      } catch (e) {}
+    };
+    fetchLive();
+    const interval = setInterval(fetchLive, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleDeleteSelected = async () => {
@@ -120,6 +136,21 @@ export default function AnalyticsAdmin() {
           </div>
         </div>
       )}
+
+      {/* Live Visitors Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] p-6 md:p-8 flex items-center justify-between shadow-lg shadow-blue-500/20 text-white animate-in zoom-in-95 duration-500">
+        <div className="flex items-center gap-4">
+          <div className="relative flex h-5 w-5">
+            {liveCount > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>}
+            <span className={`relative inline-flex rounded-full h-5 w-5 ${liveCount > 0 ? 'bg-green-400' : 'bg-white/30'}`}></span>
+          </div>
+          <div>
+            <h3 className="text-xl font-bold tracking-tight">Real-Time Presence</h3>
+            <p className="text-blue-100 text-sm font-medium">Active sessions on your portfolio right now.</p>
+          </div>
+        </div>
+        <div className="text-5xl font-black">{liveCount}</div>
+      </div>
 
       {/* Top Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -228,6 +259,37 @@ export default function AnalyticsAdmin() {
               <div className="text-zinc-500 text-sm">No device data available.</div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Annual Activity Heatmap */}
+      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm w-full overflow-x-auto">
+        <h3 className="text-lg font-bold mb-6 flex items-center gap-2 min-w-max">
+          <TrendingUp className="text-zinc-400" /> Annual Activity
+        </h3>
+        <div className="min-w-max flex justify-center pb-4">
+          {data?.heatmapData && data.heatmapData.length > 0 ? (
+            <ActivityCalendar 
+              data={data.heatmapData} 
+              theme={{
+                light: ['#f4f4f5', '#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8'],
+                dark: ['#18181b', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'],
+              }}
+              labels={{
+                legend: {
+                  less: 'Less',
+                  more: 'More',
+                },
+                months: [
+                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+                ],
+                totalCount: '{{count}} visits in the last year',
+              }}
+            />
+          ) : (
+            <div className="text-zinc-500 text-sm py-10">No activity data yet.</div>
+          )}
         </div>
       </div>
 
