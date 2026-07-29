@@ -31,6 +31,22 @@ export async function POST(req: Request) {
        return NextResponse.json({ success: true, ignored: true });
     }
 
+    // Check for duplicate visit from same IP within the last 24 hours
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const existingVisit = await prisma.pageVisit.findFirst({
+      where: {
+        ipHash,
+        path: data.path || '/',
+        visitedAt: {
+          gte: oneDayAgo
+        }
+      }
+    });
+
+    if (existingVisit) {
+      return NextResponse.json({ success: true, ignored: true, reason: 'already_visited_recently' });
+    }
+
     await prisma.pageVisit.create({
       data: {
         path: data.path || '/',
