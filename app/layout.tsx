@@ -53,7 +53,7 @@ export async function generateMetadata(): Promise<Metadata> {
       capable: true,
     },
     icons: {
-      apple: '/icon-192x192.png',
+      apple: '/icon.jpg',
     },
   };
 }
