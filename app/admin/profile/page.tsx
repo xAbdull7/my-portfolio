@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Save, User, Link as LinkIcon, Music, BookOpen, Brain, Globe, Trash2 } from 'lucide-react';
+import { Save, User, Link as LinkIcon, Music, BookOpen, Brain, Globe, Trash2, GripVertical, ChevronDown } from 'lucide-react';
+import { Reorder } from 'framer-motion';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 export default function ProfileAdmin() {
@@ -34,7 +35,7 @@ export default function ProfileAdmin() {
               eduMajor: data.eduMajor || '',
               eduUni: data.eduUni || '',
               eduYear: data.eduYear || '',
-              timeline: data.timeline && Array.isArray(data.timeline) ? data.timeline : [],
+              timeline: data.timeline && Array.isArray(data.timeline) ? data.timeline.map((t: any) => ({ ...t, id: t.id || crypto.randomUUID() })) : [],
               softSkills: data.softSkills ? data.softSkills.join(', ') : '',
               languages: data.languages && Array.isArray(data.languages) ? data.languages.map((l: any) => {
                 if (typeof l === 'string') {
@@ -201,20 +202,25 @@ export default function ProfileAdmin() {
                       className="w-full sm:flex-1 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
                     />
                     <div className="flex gap-2 w-full sm:w-auto">
-                      <select 
-                        value={lang.level}
-                        onChange={(e) => {
-                          const newLangs = [...formData.languages];
-                          newLangs[index].level = e.target.value;
-                          setFormData({...formData, languages: newLangs});
-                        }}
-                        className="flex-1 sm:flex-none sm:w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
-                      >
-                        <option value="Native" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Native</option>
-                        <option value="Fluent" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Fluent</option>
-                        <option value="Intermediate" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Intermediate</option>
-                        <option value="Beginner" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Beginner</option>
-                      </select>
+                      <div className="relative flex-1 sm:flex-none sm:w-32 md:w-40">
+                        <select 
+                          value={lang.level}
+                          onChange={(e) => {
+                            const newLangs = [...formData.languages];
+                            newLangs[index].level = e.target.value;
+                            setFormData({...formData, languages: newLangs});
+                          }}
+                          className="w-full h-full px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200 appearance-none pr-10"
+                        >
+                          <option value="Native" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Native</option>
+                          <option value="Fluent" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Fluent</option>
+                          <option value="Intermediate" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Intermediate</option>
+                          <option value="Beginner" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Beginner</option>
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                          <ChevronDown size={16} />
+                        </div>
+                      </div>
                       <button 
                         type="button"
                         onClick={() => {
@@ -246,36 +252,49 @@ export default function ProfileAdmin() {
           <div className="flex items-center gap-2 text-lg font-semibold border-b border-zinc-100 dark:border-white/5 pb-4 mb-2">
             <BookOpen className="text-zinc-400" /> Experience & Education Timeline
           </div>
-          <div className="space-y-4">
+          <Reorder.Group axis="y" values={formData.timeline} onReorder={(newOrder) => setFormData({...formData, timeline: newOrder})} className="space-y-4">
             {formData.timeline.map((item, index) => (
-              <div key={index} className="p-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-white/10 rounded-2xl space-y-4 relative group">
+              <Reorder.Item 
+                key={item.id} 
+                value={item} 
+                className="p-4 bg-zinc-50 dark:bg-[#111] border border-zinc-200 dark:border-white/10 rounded-2xl space-y-4 relative group cursor-grab active:cursor-grabbing"
+              >
+                <div className="absolute top-4 left-4 p-2 text-zinc-400 opacity-50 hover:text-zinc-900 dark:hover:text-white transition-colors z-10" title="Drag to reorder">
+                  <GripVertical size={16} />
+                </div>
                 <button 
                   type="button"
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={() => {
                     const newTimeline = formData.timeline.filter((_, i) => i !== index);
                     setFormData({...formData, timeline: newTimeline});
                   }}
-                  className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                  className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100 z-10"
                   title="Remove Item"
                 >
                   <Trash2 size={16} />
                 </button>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-0 md:pr-10 pt-8 md:pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-10 pr-0 md:pr-10 pt-8 md:pt-0" onPointerDown={(e) => e.stopPropagation()}>
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Type</label>
-                    <select 
-                      value={item.type}
-                      onChange={(e) => {
-                        const newTimeline = [...formData.timeline];
-                        newTimeline[index].type = e.target.value;
-                        setFormData({...formData, timeline: newTimeline});
-                      }}
-                      className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer"
-                    >
-                      <option value="experience">Experience</option>
-                      <option value="education">Education</option>
-                    </select>
+                    <div className="relative">
+                      <select 
+                        value={item.type}
+                        onChange={(e) => {
+                          const newTimeline = [...formData.timeline];
+                          newTimeline[index].type = e.target.value;
+                          setFormData({...formData, timeline: newTimeline});
+                        }}
+                        className="w-full px-4 py-3 bg-white dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer appearance-none text-zinc-900 dark:text-white pr-10"
+                      >
+                        <option value="experience">Experience</option>
+                        <option value="education">Education</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-400">
+                        <ChevronDown size={16} />
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Date / Year</label>
@@ -331,12 +350,13 @@ export default function ProfileAdmin() {
                     />
                   </div>
                 </div>
-              </div>
+              </Reorder.Item>
             ))}
+          </Reorder.Group>
             
-            <button 
-              type="button"
-              onClick={() => setFormData({...formData, timeline: [...formData.timeline, { type: 'experience', title: '', subtitle: '', date: '', description: '' }]})}
+          <button 
+            type="button"
+            onClick={() => setFormData({...formData, timeline: [...formData.timeline, { id: crypto.randomUUID(), type: 'experience', title: '', subtitle: '', date: '', description: '' }]})}
               className="text-sm font-semibold text-zinc-900 dark:text-white bg-zinc-100 dark:bg-white/10 px-5 py-2.5 rounded-full hover:bg-zinc-200 dark:hover:bg-white/20 transition-colors mt-2"
             >
               + Add Timeline Item
