@@ -190,10 +190,12 @@ export default function AnalyticsAdmin() {
          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
           <Globe className="text-zinc-400" /> Geographic Distribution
         </h3>
-        <div className="space-y-4">
+        <div className="space-y-4 w-full">
            {data?.geoDistribution && data.geoDistribution.length > 0 ? (
-              <div className="w-full h-full min-h-[400px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center cursor-move">
-                 <GeoMap data={data.geoDistribution} />
+              <div className="w-full h-[300px] md:h-[400px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center cursor-move relative">
+                 <div className="absolute inset-0 w-full h-full">
+                    <GeoMap data={data.geoDistribution} />
+                 </div>
               </div>
            ) : (
              <p className="text-zinc-500 text-sm">No location data available.</p>

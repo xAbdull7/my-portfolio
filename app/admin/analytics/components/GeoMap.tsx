@@ -37,7 +37,7 @@ export default function GeoMap({ data }: GeoMapProps) {
   }, {} as Record<string, { country: string; count: number }>);
 
   return (
-    <div className="w-full h-full relative" style={{ minHeight: '400px' }}>
+    <div className="w-full h-full relative">
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{
@@ -45,7 +45,7 @@ export default function GeoMap({ data }: GeoMapProps) {
         }}
         width={800}
         height={400}
-        style={{ width: "100%", height: "auto" }}
+        style={{ width: "100%", height: "100%" }}
       >
         <ZoomableGroup zoom={1} center={[0, 0]} maxZoom={5}>
           <Geographies geography={geoUrl}>

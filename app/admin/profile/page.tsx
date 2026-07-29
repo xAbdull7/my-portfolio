@@ -187,9 +187,9 @@ export default function ProfileAdmin() {
             
             <div className="space-y-3">
               <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Languages & Proficiency</label>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {formData.languages.map((lang, index) => (
-                  <div key={index} className="flex gap-2 items-center">
+                  <div key={index} className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:items-center">
                     <input 
                       value={lang.name}
                       onChange={(e) => {
@@ -198,33 +198,35 @@ export default function ProfileAdmin() {
                         setFormData({...formData, languages: newLangs});
                       }}
                       placeholder="e.g. English"
-                      className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
+                      className="w-full sm:flex-1 px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm"
                     />
-                    <select 
-                      value={lang.level}
-                      onChange={(e) => {
-                        const newLangs = [...formData.languages];
-                        newLangs[index].level = e.target.value;
-                        setFormData({...formData, languages: newLangs});
-                      }}
-                      className="w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
-                    >
-                      <option value="Native" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Native</option>
-                      <option value="Fluent" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Fluent</option>
-                      <option value="Intermediate" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Intermediate</option>
-                      <option value="Beginner" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Beginner</option>
-                    </select>
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        const newLangs = formData.languages.filter((_, i) => i !== index);
-                        setFormData({...formData, languages: newLangs});
-                      }}
-                      className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-colors shrink-0 flex items-center justify-center"
-                      title="Remove Language"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-                    </button>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <select 
+                        value={lang.level}
+                        onChange={(e) => {
+                          const newLangs = [...formData.languages];
+                          newLangs[index].level = e.target.value;
+                          setFormData({...formData, languages: newLangs});
+                        }}
+                        className="flex-1 sm:flex-none sm:w-32 md:w-40 px-4 py-3 bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm cursor-pointer text-zinc-900 dark:text-zinc-200"
+                      >
+                        <option value="Native" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Native</option>
+                        <option value="Fluent" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Fluent</option>
+                        <option value="Intermediate" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Intermediate</option>
+                        <option value="Beginner" className="bg-white dark:bg-[#1a1a1a] text-zinc-900 dark:text-zinc-200">Beginner</option>
+                      </select>
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          const newLangs = formData.languages.filter((_, i) => i !== index);
+                          setFormData({...formData, languages: newLangs});
+                        }}
+                        className="p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-colors shrink-0 flex items-center justify-center"
+                        title="Remove Language"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

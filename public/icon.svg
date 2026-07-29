@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="128" fill="#000000" />
-  <path d="M156 256l100-100 100 100-100 100z" fill="#ffffff" />
-  <text x="256" y="380" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#ffffff" text-anchor="middle">AM</text>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181b" />
+      <stop offset="100%" stop-color="#000000" />
+    </linearGradient>
+    <linearGradient id="a" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#8b5cf6" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <path d="M256 140 L140 370 H200 L230 300 H282 L312 370 H372 Z M247 250 L256 200 L265 250 Z" fill="url(#a)" />
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#a)" stroke-width="12" stroke-dasharray="40 20" opacity="0.4" />
 </svg>
