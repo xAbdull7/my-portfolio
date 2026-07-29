@@ -231,23 +231,23 @@ export default function AnalyticsAdmin() {
         </div>
       </div>
 
-      {/* Top Pages and Recent Visits */}
+      {/* Top Browsers and Recent Visits */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-1 h-fit">
            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <LayoutTemplate className="text-zinc-400" /> Top Visited Pages
+            <Globe className="text-zinc-400" /> Top Browsers
           </h3>
           <div className="space-y-4">
-             {data?.topPages && data.topPages.length > 0 ? data.topPages.map((page: any, i: number) => (
-               <div key={page.path} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
+             {data?.browserDistribution && data.browserDistribution.length > 0 ? data.browserDistribution.map((browser: any, i: number) => (
+               <div key={browser.name} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
                  <div className="flex items-center gap-3">
                    <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">{i + 1}</div>
-                   <span className="font-semibold text-sm truncate max-w-[150px]">{formatPath(page.path)}</span>
+                   <span className="font-semibold text-sm truncate max-w-[150px]">{browser.name}</span>
                  </div>
-                 <div className="font-black text-lg">{page.count}</div>
+                 <div className="font-black text-lg">{browser.value}</div>
                </div>
              )) : (
-               <p className="text-zinc-500 text-sm">No pages visited yet.</p>
+               <p className="text-zinc-500 text-sm">No browser data yet.</p>
              )}
           </div>
         </div>
