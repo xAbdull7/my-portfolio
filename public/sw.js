@@ -9,6 +9,7 @@ self.addEventListener('push', function (event) {
         badge: data.badge,
         vibrate: data.vibrate,
         requireInteraction: data.requireInteraction,
+        actions: data.actions,
         data: {
           url: data.url || '/admin/messages'
         }
@@ -22,6 +23,11 @@ self.addEventListener('push', function (event) {
 
 self.addEventListener('notificationclick', function (event) {
   event.notification.close();
+  
+  if (event.action === 'dismiss') {
+    return;
+  }
+
   const urlToOpen = event.notification.data?.url || '/admin/messages';
 
   event.waitUntil(

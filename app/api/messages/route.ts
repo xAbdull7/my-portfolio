@@ -53,13 +53,17 @@ export async function POST(req: Request) {
         const subscriptions = await prisma.pushSubscription.findMany();
         
         const payload = JSON.stringify({
-          title: `📩 رسالة جديدة من: ${data.name}`,
-          body: `"${data.message.substring(0, 70)}..."`,
-          icon: '/icon-192x192.png',
+          title: `✨ لديك رسالة تواصل جديدة!`,
+          body: `👤 المرسل: ${data.name} | ✉️ ${data.email}\nاضغط لقراءة تفاصيل الرسالة كاملة.`,
+          icon: '/icon.jpg',
           badge: '/icon.svg',
           vibrate: [200, 100, 200],
           requireInteraction: true,
-          url: '/admin/messages'
+          url: '/admin/messages',
+          actions: [
+            { action: 'read', title: 'قراءة الرسالة 📖' },
+            { action: 'dismiss', title: 'تجاهل ❌' }
+          ]
         });
 
         const errors: string[] = [];
