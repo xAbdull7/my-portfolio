@@ -60,19 +60,106 @@ export async function GET() {
       orderBy: { visitedAt: 'desc' }
     });
     
-    // Basic aggregation
     const totalVisits = visits.length;
     
-    // Calculate today's visits
+    // Unique Visitors
+    const uniqueIps = new Set(visits.map(v => v.ipHash).filter(Boolean));
+    const uniqueVisitors = uniqueIps.size;
+    
+    // Today's Visits
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const todayVisits = visits.filter((v: any) => new Date(v.visitedAt) >= today).length;
 
+    // Top Pages
+    const pathCounts: Record<string, number> = {};
+    visits.forEach(v => {
+      pathCounts[v.path] = (pathCounts[v.path] || 0) + 1;
+    });
+    const topPages = Object.entries(pathCounts)
+      .map(([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // Geo Distribution
+    const geoCounts: Record<string, number> = {};
+    visits.forEach(v => {
+      if (v.country && v.country !== 'Unknown') {
+        geoCounts[v.country] = (geoCounts[v.country] || 0) + 1;
+      }
+    });
+    const geoDistribution = Object.entries(geoCounts)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+      
+    // Device & Browser Distribution (for Donut Charts)
+    const deviceCounts: Record<string, number> = {};
+    const browserCounts: Record<string, number> = {};
+    visits.forEach(v => {
+      const dev = v.device || 'Desktop';
+      deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
+      if (v.browser && v.browser !== 'Unknown') browserCounts[v.browser] = (browserCounts[v.browser] || 0) + 1;
+    });
+    const deviceDistribution = Object.entries(deviceCounts).map(([name, value]) => ({ name, value }));
+    const browserDistribution = Object.entries(browserCounts).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value - a.value).slice(0,5);
+
+    // 7-day trend
+    const last7Days = Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }).reverse();
+    
+    const chartData = last7Days.map(date => {
+      const nextDay = new Date(date);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const count = visits.filter(v => {
+        const vDate = new Date(v.visitedAt);
+        return vDate >= date && vDate < nextDay;
+      }).length;
+      return {
+        name: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        visits: count
+      };
+    });
+
     return NextResponse.json({
       totalVisits,
+      uniqueVisitors,
       todayVisits,
-      recentVisits: visits.slice(0, 50) // Just returning the last 50 visits for simplicity
+      topPages,
+      geoDistribution,
+      deviceDistribution,
+      browserDistribution,
+      chartData,
+      recentVisits: visits.slice(0, 100)
     });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// DELETE: Bulk or singular delete
+export async function DELETE(req: Request) {
+  const session = await getServerSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  try {
+    const data = await req.json();
+    
+    if (data.action === 'deleteAll') {
+      await prisma.pageVisit.deleteMany();
+      return NextResponse.json({ success: true, message: 'All visits deleted' });
+    } else if (data.action === 'deleteSelected' && Array.isArray(data.ids)) {
+      await prisma.pageVisit.deleteMany({
+        where: { id: { in: data.ids } }
+      });
+      return NextResponse.json({ success: true, message: `Deleted ${data.ids.length} visits` });
+    }
+
+    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
