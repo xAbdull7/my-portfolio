@@ -47,7 +47,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, ignored: true, reason: 'already_visited_recently' });
     }
 
-    await prisma.pageVisit.create({
+    const visitRecord = await prisma.pageVisit.create({
       data: {
         path: data.path || '/',
         browser,
@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       }
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, id: visitRecord.id });
   } catch (error: any) {
     // Fail silently for tracking
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -170,6 +170,11 @@ export async function GET() {
       heatmapData.push({ date: dateStr, count, level });
     }
 
+    const recentVisits = visits.slice(0, 100);
+
+    const durations = visits.filter((v: any) => v.duration && v.duration > 0).map((v: any) => v.duration);
+    const averageDuration = durations.length > 0 ? durations.reduce((a: number, b: number) => a + b, 0) / durations.length : 0;
+
     return NextResponse.json({
       totalVisits,
       uniqueVisitors,
@@ -180,7 +185,8 @@ export async function GET() {
       browserDistribution,
       chartData,
       heatmapData,
-      recentVisits: visits.slice(0, 100)
+      recentVisits,
+      averageDuration,
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

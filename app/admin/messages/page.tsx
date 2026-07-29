@@ -1,59 +1,47 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { Mail, Trash2, CheckCircle, Clock } from 'lucide-react';
+import useSWR from 'swr';
+
+const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function MessagesAdmin() {
-  const [messages, setMessages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchMessages = async () => {
-    try {
-      const res = await fetch('/api/messages');
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchMessages();
-    
-    // Auto-refresh messages every 5 seconds
-    const interval = setInterval(() => {
-      fetchMessages();
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  const { data: messages = [], error, isLoading, mutate } = useSWR('/api/messages', fetcher, {
+    refreshInterval: 1000, // Poll every second for instant feel
+  });
 
   const markAsRead = async (id: string, currentRead: boolean) => {
+    // Optimistic update
+    mutate(messages.map((m: any) => m.id === id ? { ...m, read: !currentRead } : m), false);
+    
     try {
-      const res = await fetch(`/api/messages/${id}`, {
+      await fetch(`/api/messages/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ read: !currentRead })
       });
-      if (res.ok) fetchMessages();
+      mutate();
     } catch (err) {
       console.error(err);
+      mutate(); // Revert on error
     }
   };
 
   const deleteMessage = async (id: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
+    
+    // Optimistic update
+    mutate(messages.filter((m: any) => m.id !== id), false);
+
     try {
-      const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' });
-      if (res.ok) fetchMessages();
+      await fetch(`/api/messages/${id}`, { method: 'DELETE' });
+      mutate();
     } catch (err) {
       console.error(err);
+      mutate(); // Revert on error
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 border-2 border-zinc-900 dark:border-white border-t-transparent rounded-full animate-spin"></div>

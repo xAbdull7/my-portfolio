@@ -102,6 +102,16 @@ export default function AnalyticsAdmin() {
 
   const formatPath = (p: string) => p === '/' ? 'Home Page' : p;
 
+  const formatDuration = (seconds: number) => {
+    if (!seconds) return '0s';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -153,7 +163,7 @@ export default function AnalyticsAdmin() {
       </div>
 
       {/* Top Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-blue-500/50 transition-colors overflow-hidden w-full max-w-full">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
@@ -182,6 +192,16 @@ export default function AnalyticsAdmin() {
             <span className="font-semibold text-sm text-zinc-500">Visits Today</span>
           </div>
           <div className="text-5xl font-black tracking-tight">{data?.todayVisits || 0}</div>
+        </div>
+
+        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-amber-500/50 transition-colors overflow-hidden w-full max-w-full">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+              <Clock size={20} />
+            </div>
+            <span className="font-semibold text-sm text-zinc-500">Avg. Duration</span>
+          </div>
+          <div className="text-3xl font-black tracking-tight mt-2">{formatDuration(data?.averageDuration || 0)}</div>
         </div>
       </div>
 
@@ -389,6 +409,12 @@ export default function AnalyticsAdmin() {
                   </div>
   
                   <div className="flex flex-wrap items-center gap-2 md:gap-3 md:justify-end">
+                    {v.duration !== undefined && v.duration > 0 && (
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-xs font-bold text-amber-700 dark:text-amber-400 shadow-sm">
+                        <Clock size={14} />
+                        {formatDuration(v.duration)}
+                      </span>
+                    )}
                     {v.country && (
                       <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
                         <Globe size={14} className="text-blue-500" />

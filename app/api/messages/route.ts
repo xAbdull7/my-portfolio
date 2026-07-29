@@ -58,6 +58,8 @@ export async function POST(req: Request) {
           url: '/admin/messages'
         });
 
+        const errors: string[] = [];
+
         await Promise.all(subscriptions.map(async (sub) => {
           try {
             await webpush.sendNotification({
@@ -69,17 +71,41 @@ export async function POST(req: Request) {
             }, payload);
           } catch (e: any) {
             if (e.statusCode === 410 || e.statusCode === 404) {
-              // Subscription has expired or is no longer valid
               await prisma.pushSubscription.delete({ where: { id: sub.id } });
             } else {
               console.error('Error sending push notification', e);
+              errors.push(`Sub: ${sub.endpoint.substring(0,20)}... Err: ${e.message}`);
             }
           }
         }));
+
+        if (errors.length > 0) {
+           await prisma.message.create({
+             data: {
+               name: 'System Error (Push)',
+               email: 'system@portfolio.local',
+               message: `Failed to send push notifications. Errors:\n\n${errors.join('\n')}`,
+             }
+           });
+        }
+      } else {
+        await prisma.message.create({
+           data: {
+             name: 'System Config Error',
+             email: 'system@portfolio.local',
+             message: `Missing VAPID keys. Public: ${!!publicVapidKey}, Private: ${!!privateVapidKey}`,
+           }
+         });
       }
-    } catch (pushError) {
+    } catch (pushError: any) {
       console.error('Failed to trigger push notifications:', pushError);
-      // We don't fail the message creation if push fails
+      await prisma.message.create({
+         data: {
+           name: 'System Fatal Error (Push)',
+           email: 'system@portfolio.local',
+           message: `Push notification module failed completely:\n${pushError.message}\n${pushError.stack}`,
+         }
+       });
     }
 
     return NextResponse.json({ success: true, message: messageRecord });

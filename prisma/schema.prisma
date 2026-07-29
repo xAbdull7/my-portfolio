@@ -89,6 +89,7 @@ model PageVisit {
   country   String?
   city      String?
   ipHash    String?
+  duration  Int      @default(0)
 }
 
 model LiveVisitor {

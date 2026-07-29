@@ -1,36 +1,52 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 export default function AnalyticsTracker() {
   const pathname = usePathname();
+  const visitIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Only track in production or ignore if needed, but for MVP we track everything
-    // except admin routes
     if (pathname && !pathname.startsWith('/admin')) {
-      // 1. Initial Page Visit (stores historical data)
+      // 1. Initial Page Visit
       fetch('/api/analytics', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: pathname }),
-      }).catch(err => console.error('Failed to log visit', err));
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.id) {
+          visitIdRef.current = data.id;
+        }
+      })
+      .catch(err => console.error('Failed to log visit', err));
 
-      // 2. Initial Ping (immediately registers as an active visitor)
+      // 2. Initial Ping for Live Visitors
       fetch('/api/analytics/live', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path: pathname }),
       }).catch(() => {});
 
-      // 3. Heartbeat (keeps the visitor active while they stay on the page)
+      // 3. Heartbeat every 5 seconds
       const interval = setInterval(() => {
+        // Live tracking
         fetch('/api/analytics/live', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ path: pathname }),
         }).catch(() => {});
-      }, 30000);
+
+        // Session duration ping
+        if (visitIdRef.current) {
+          fetch('/api/analytics/ping', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: visitIdRef.current }),
+          }).catch(() => {});
+        }
+      }, 5000);
 
       return () => clearInterval(interval);
     }
