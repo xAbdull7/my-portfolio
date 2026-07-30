@@ -18,13 +18,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ [
   const session = await getServerSession();
   const showDrafts = isPreview && session !== null;
 
-  const profile = await prisma.profile.findUnique({
+  const profileRaw = await prisma.profile.findUnique({
     where: { id: 'default' }
   });
 
-  if (!profile) {
+  if (!profileRaw) {
     return <div className="p-8 text-center">Loading profile...</div>;
   }
+
+  const profile = {
+    ...profileRaw,
+    resumeUrl: profileRaw.resumeUrl && profileRaw.resumeUrl.startsWith('data:') ? '/api/resume' : profileRaw.resumeUrl,
+  };
 
   return (
     // هنا الكونتينر الأساسي اللي بيمسك الصفحة كلها وبيديلها مساحات من الجناب وتأثير تغيير اللون

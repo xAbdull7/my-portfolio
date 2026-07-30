@@ -60,6 +60,21 @@ export default function ProfileAdmin() {
     fetchProfile();
   }, []);
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('File is too large! Maximum size is 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, resumeUrl: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -138,8 +153,19 @@ export default function ProfileAdmin() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Resume URL</label>
-              <input value={formData.resumeUrl} onChange={(e) => setFormData({...formData, resumeUrl: e.target.value})} className="w-full px-4 py-3 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm" />
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Resume / CV (PDF max 2MB)</label>
+              <input 
+                type="file" 
+                accept="application/pdf"
+                onChange={handleFileUpload} 
+                className="w-full px-4 py-2.5 bg-zinc-50 dark:bg-white/5 border border-zinc-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-white transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-zinc-100 file:text-zinc-700 hover:file:bg-zinc-200 dark:file:bg-white/10 dark:file:text-zinc-300 cursor-pointer" 
+              />
+              {formData.resumeUrl && formData.resumeUrl.startsWith('data:') && (
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ CV is uploaded and active.</p>
+              )}
+              {formData.resumeUrl && !formData.resumeUrl.startsWith('data:') && (
+                <p className="text-xs text-zinc-500 mt-1">External CV link is active.</p>
+              )}
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">GitHub URL</label>

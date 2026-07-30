@@ -23,7 +23,13 @@ import { prisma } from '@/lib/prisma';
 export async function generateMetadata(): Promise<Metadata> {
   let profile = null;
   try {
-    profile = await prisma.profile.findUnique({ where: { id: 'default' } });
+    profile = await prisma.profile.findUnique({ 
+      where: { id: 'default' },
+      select: {
+        seoTitle: true, seoDescription: true, seoKeywords: true,
+        name: true, role: true, bio: true
+      }
+    });
   } catch (error) {
     console.error("Failed to fetch profile for metadata", error);
   }
