@@ -52,7 +52,7 @@ export function MobileNav() {
             {isActive && (
               <motion.div
                 layoutId="mobile-active-tab"
-                className="absolute inset-0 bg-white dark:bg-white/10 rounded-2xl shadow-sm border border-zinc-200 dark:border-white/10 -z-10"
+                className="absolute inset-0 bg-white dark:bg-white/10 rounded-full shadow-sm border border-zinc-200 dark:border-white/10 -z-10"
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
