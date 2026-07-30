@@ -7,6 +7,7 @@ import MarkdownEditor from '@/components/admin/MarkdownEditor';
 export default function ProfileAdmin() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [initialData, setInitialData] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '', role: '', bio: '',
     resumeUrl: '', githubUrl: '', linkedinUrl: '', twitterUrl: '', emailUrl: '',
@@ -23,7 +24,7 @@ export default function ProfileAdmin() {
         if (res.ok) {
           const data = await res.json();
           if (data) {
-            setFormData({
+            const fetchedData = {
               name: data.name || '',
               role: data.role || '',
               bio: data.bio || '',
@@ -46,7 +47,9 @@ export default function ProfileAdmin() {
               seoTitle: data.seoTitle || '',
               seoDescription: data.seoDescription || '',
               seoKeywords: data.seoKeywords || '',
-            });
+            };
+            setFormData(fetchedData);
+            setInitialData(JSON.stringify(fetchedData));
           }
         }
       } catch (err) {
@@ -77,6 +80,7 @@ export default function ProfileAdmin() {
 
       if (res.ok) {
         alert('Profile saved successfully!');
+        setInitialData(JSON.stringify(formData));
       } else {
         alert('Failed to save profile');
       }
@@ -95,8 +99,10 @@ export default function ProfileAdmin() {
     );
   }
 
+  const hasChanges = initialData !== JSON.stringify(formData);
+
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-12">
       <div>
         <h1 className="text-3xl font-bold tracking-tight mb-2">Profile Data</h1>
         <p className="text-zinc-500 text-sm">Update your personal information, links, and education.</p>
@@ -402,11 +408,11 @@ export default function ProfileAdmin() {
           </div>
         </div>
 
-        <div className="flex justify-end pt-4 sticky bottom-6 z-10">
+        <div className={`flex justify-end pt-4 sticky bottom-6 z-10 transition-all duration-300 ${hasChanges ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
           <button 
             type="submit" 
-            disabled={saving}
-            className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3.5 rounded-full font-bold flex items-center gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-lg disabled:opacity-70"
+            disabled={saving || !hasChanges}
+            className="bg-zinc-900 dark:bg-white text-white dark:text-black px-8 py-3.5 rounded-full font-bold flex items-center gap-2 hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)] disabled:opacity-70"
           >
             {saving ? <div className="w-5 h-5 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin"></div> : <Save size={18} />}
             {saving ? 'Saving...' : 'Save Profile Changes'}
