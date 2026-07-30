@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Save, Code2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function TechStackAdmin() {
   const [loading, setLoading] = useState(true);
@@ -47,13 +48,13 @@ export default function TechStackAdmin() {
       });
 
       if (res.ok) {
-        alert('Tech Stack saved successfully!');
+        toast.success('Tech Stack saved successfully!');
       } else {
-        alert('Failed to save tech stack');
+        toast.error('Failed to save tech stack');
       }
     } catch (err) {
       console.error(err);
-      alert('Error saving tech stack');
+      toast.error('Error saving tech stack');
     }
     setSaving(false);
   };

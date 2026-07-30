@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Save, User, Link as LinkIcon, Music, BookOpen, Brain, Globe, Trash2, GripVertical, ChevronDown } from 'lucide-react';
 import { Reorder } from 'framer-motion';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
+import { toast } from 'sonner';
 
 export default function ProfileAdmin() {
   const [loading, setLoading] = useState(true);
@@ -64,7 +65,7 @@ export default function ProfileAdmin() {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        alert('File is too large! Maximum size is 2MB.');
+        toast.error('File is too large! Maximum size is 2MB.');
         return;
       }
       const reader = new FileReader();
@@ -94,14 +95,14 @@ export default function ProfileAdmin() {
       });
 
       if (res.ok) {
-        alert('Profile saved successfully!');
+        toast.success('Profile saved successfully!');
         setInitialData(JSON.stringify(formData));
       } else {
-        alert('Failed to save profile');
+        toast.error('Failed to save profile');
       }
     } catch (err) {
       console.error(err);
-      alert('Error saving profile');
+      toast.error('Error saving profile');
     }
     setSaving(false);
   };

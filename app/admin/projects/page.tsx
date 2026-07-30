@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Edit2, Trash2, Plus, GripVertical, Folder, X, Save, Eye, EyeOff, ExternalLink, Terminal, User, Hexagon, Check, Library } from 'lucide-react';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
+import { toast } from 'sonner';
 import {
   DndContext,
   closestCenter,
@@ -176,6 +177,7 @@ export default function ProjectsAdmin() {
         });
       } catch (error) {
         console.error("Failed to reorder", error);
+        toast.error('Failed to save new order');
       }
       setIsSavingOrder(false);
     }
@@ -239,12 +241,13 @@ export default function ProjectsAdmin() {
       if (res.ok) {
         closeModal();
         fetchProjects();
+        toast.success(editingProject ? 'Project updated!' : 'Project created!');
       } else {
-        alert('Failed to save project');
+        toast.error('Failed to save project');
       }
     } catch (err) {
       console.error(err);
-      alert('An error occurred while saving.');
+      toast.error('An error occurred while saving.');
     }
   };
 
@@ -255,11 +258,13 @@ export default function ProjectsAdmin() {
       const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchProjects();
+        toast.success('Project deleted!');
       } else {
-        alert('Failed to delete project');
+        toast.error('Failed to delete project');
       }
     } catch (err) {
       console.error(err);
+      toast.error('An error occurred while deleting.');
     }
   };
 
