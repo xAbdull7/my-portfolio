@@ -22,11 +22,8 @@ export function DesktopNav() {
         
         if (isActive) {
           return (
-            <Link key={link.href} href={link.href} className="relative inline-flex overflow-hidden rounded-2xl p-[1px]">
-              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
-              <span className="flex w-full h-full items-center gap-3 bg-white dark:bg-[#050505] px-4 py-3 rounded-2xl font-medium text-sm text-zinc-900 dark:text-white transition-colors">
-                <link.icon size={18} /> {link.label}
-              </span>
+            <Link key={link.href} href={link.href} className="px-4 py-3 rounded-2xl border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 transition-colors font-medium text-sm flex items-center gap-3 text-zinc-900 dark:text-white shadow-sm">
+              <link.icon size={18} /> {link.label}
             </Link>
           );
         }
@@ -51,12 +48,9 @@ export function MobileNav() {
         
         if (isActive) {
           return (
-            <Link key={link.href} href={link.href} className="relative inline-flex overflow-hidden rounded-xl p-[1px] w-[60px] h-[52px]">
-              <span className="absolute inset-[-1000%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#a1a1aa_50%,transparent_100%)] dark:bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,#71717a_50%,transparent_100%)]" />
-              <span className="flex flex-col w-full h-full items-center justify-center bg-white dark:bg-[#050505] rounded-xl text-zinc-900 dark:text-white transition-colors">
-                <link.icon size={20} className="mb-1" />
-                <span className="text-[10px] font-medium leading-none">{link.label}</span>
-              </span>
+            <Link key={link.href} href={link.href} className="flex flex-col items-center justify-center border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 rounded-xl text-zinc-900 dark:text-white transition-colors w-[60px] h-[52px] shadow-sm">
+              <link.icon size={20} className="mb-1" />
+              <span className="text-[10px] font-medium leading-none">{link.label}</span>
             </Link>
           );
         }
