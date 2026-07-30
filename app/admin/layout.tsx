@@ -51,12 +51,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 pb-24 pt-6 md:p-12 md:pb-12 max-w-5xl mx-auto w-full">
+      <main className="flex-1 p-4 pb-28 pt-6 md:p-12 md:pb-12 max-w-5xl mx-auto w-full">
         {children}
       </main>
 
-      {/* Mobile Bottom Tab Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#050505]/90 backdrop-blur-xl border-t border-zinc-200 dark:border-white/5 pb-safe">
+      {/* Mobile Bottom Tab Bar (Liquid Glass) */}
+      <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)]">
         <MobileNav />
       </div>
     </div>

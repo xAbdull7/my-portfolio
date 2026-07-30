@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { Folder, User, Code2, MessageSquare, BarChart3 } from 'lucide-react';
 
 export const navLinks = [
@@ -42,23 +43,33 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center justify-around p-2">
+    <nav className="flex items-center justify-around p-2 relative h-[72px]">
       {navLinks.map((link) => {
         const isActive = pathname === link.href || pathname.startsWith(link.href + '/');
         
-        if (isActive) {
-          return (
-            <Link key={link.href} href={link.href} className="flex flex-col items-center justify-center border border-zinc-200 dark:border-white/10 bg-white dark:bg-white/5 rounded-xl text-zinc-900 dark:text-white transition-colors w-[60px] h-[52px] shadow-sm">
-              <link.icon size={20} className="mb-1" />
-              <span className="text-[10px] font-medium leading-none">{link.label}</span>
-            </Link>
-          );
-        }
-
         return (
-          <Link key={link.href} href={link.href} className="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition-colors w-[60px] h-[52px]">
-            <link.icon size={20} className="mb-1" />
-            <span className="text-[10px] font-medium leading-none">{link.label}</span>
+          <Link key={link.href} href={link.href} className="relative flex flex-col items-center justify-center w-[64px] h-[56px] z-10">
+            {isActive && (
+              <motion.div
+                layoutId="mobile-active-tab"
+                className="absolute inset-0 bg-white dark:bg-white/10 rounded-2xl shadow-sm border border-zinc-200 dark:border-white/10 -z-10"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            <motion.div
+               initial={false}
+               animate={{ y: isActive ? -2 : 0, scale: isActive ? 1.1 : 1 }}
+               transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            >
+               <link.icon size={22} className={`mb-1 transition-colors ${isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-500'}`} />
+            </motion.div>
+            <motion.span 
+              initial={false}
+              animate={{ opacity: isActive ? 1 : 0.7, y: isActive ? 0 : 2 }}
+              className={`text-[10px] font-medium leading-none transition-colors ${isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-500'}`}
+            >
+              {link.label}
+            </motion.span>
           </Link>
         );
       })}
