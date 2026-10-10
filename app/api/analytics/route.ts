@@ -109,16 +109,43 @@ export async function GET() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
       
-    // Device & Browser Distribution (for Donut Charts)
+    // Top Cities Breakdown for CIA Geo Dossier
+    const cityCounts: Record<string, { city: string; country: string; count: number; totalDuration: number }> = {};
+    visits.forEach(v => {
+      if (v.city && v.city !== 'Unknown') {
+        const key = `${v.city}_${v.country || ''}`;
+        if (!cityCounts[key]) {
+          cityCounts[key] = { city: v.city, country: v.country || 'Unknown', count: 0, totalDuration: 0 };
+        }
+        cityCounts[key].count += 1;
+        cityCounts[key].totalDuration += (v.duration || 0);
+      }
+    });
+    const topCities = Object.values(cityCounts)
+      .map(item => ({
+        city: item.city,
+        country: item.country,
+        count: item.count,
+        avgDuration: Math.round(item.count > 0 ? item.totalDuration / item.count : 0)
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8);
+
+    // Device & Browser & OS Distribution (for Matrix Telemetry)
     const deviceCounts: Record<string, number> = {};
     const browserCounts: Record<string, number> = {};
+    const osCounts: Record<string, number> = {};
+
     visits.forEach(v => {
       const dev = v.device || 'Desktop';
       deviceCounts[dev] = (deviceCounts[dev] || 0) + 1;
       if (v.browser && v.browser !== 'Unknown') browserCounts[v.browser] = (browserCounts[v.browser] || 0) + 1;
+      if (v.os && v.os !== 'Unknown') osCounts[v.os] = (osCounts[v.os] || 0) + 1;
     });
+
     const deviceDistribution = Object.entries(deviceCounts).map(([name, value]) => ({ name, value }));
     const browserDistribution = Object.entries(browserCounts).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value - a.value).slice(0,5);
+    const osDistribution = Object.entries(osCounts).map(([name, value]) => ({ name, value })).sort((a,b)=>b.value - a.value).slice(0,5);
 
     // 7-day trend
     const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -182,8 +209,10 @@ export async function GET() {
       todayVisits,
       topPages,
       geoDistribution,
+      topCities,
       deviceDistribution,
       browserDistribution,
+      osDistribution,
       chartData,
       heatmapData,
       recentVisits,
