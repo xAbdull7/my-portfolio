@@ -170,7 +170,8 @@ export async function GET() {
       heatmapData.push({ date: dateStr, count, level });
     }
 
-    const recentVisits = visits.slice(0, 100);
+    // Return up to 500 visits so all preserved logs are available for paginated table
+    const recentVisits = visits.slice(0, 500);
 
     const durations = visits.filter((v: any) => v.duration && v.duration > 0).map((v: any) => v.duration);
     const averageDuration = durations.length > 0 ? durations.reduce((a: number, b: number) => a + b, 0) / durations.length : 0;

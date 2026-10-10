@@ -82,8 +82,7 @@ export default async function AdminDashboard() {
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="font-mono text-[11px] text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Telemetry & Dashboard
+              Telemetry & Dashboard
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
@@ -156,8 +155,7 @@ export default async function AdminDashboard() {
               <span className="font-mono text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
                 {liveVisitorsCount}
               </span>
-              <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full border border-zinc-200/80 dark:border-zinc-800">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              <span className="font-mono text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded-full border border-zinc-200/80 dark:border-zinc-800">
                 Active now
               </span>
             </div>

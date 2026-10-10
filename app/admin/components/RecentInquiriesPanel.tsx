@@ -118,10 +118,7 @@ export default function RecentInquiriesPanel({
               System Telemetry
             </h4>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className="text-[10px] font-mono text-zinc-500">Operational</span>
-          </div>
+          <span className="text-[10px] font-mono text-zinc-400">Operational</span>
         </div>
 
         <div className="space-y-2.5 font-mono text-xs">

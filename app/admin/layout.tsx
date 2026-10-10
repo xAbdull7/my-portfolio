@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ExternalLink, ShieldCheck } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import NotificationToggle from './components/NotificationToggle';
@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     );
   }
 
-  // Fetch counts safely for the sidebar live badges without extra client roundtrips
+  // Fetch counts safely for the sidebar badges without extra client roundtrips
   const [unreadMessages, totalVisits, totalProjects] = await Promise.all([
     prisma.message.count({ where: { read: false } }).catch(() => 0),
     prisma.pageVisit.count().catch(() => 0),
@@ -37,10 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
           <div>
             <h2 className="text-xs font-semibold tracking-tight">Admin Console</h2>
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] text-zinc-500 font-mono">System Online</span>
-            </div>
+            <span className="text-[10px] text-zinc-500 font-mono">Portfolio Control</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -58,7 +55,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       {/* Desktop Sidebar (Monochrome Titanium) */}
       <aside className="hidden md:flex w-64 lg:w-72 bg-white dark:bg-[#0d0d11] border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 flex-col justify-between sticky top-0 h-screen z-40 shrink-0">
         <div className="space-y-6">
-          {/* Header & Status Indicator */}
+          {/* Header & Clean Static Badge */}
           <div className="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-xs shadow-sm">
@@ -68,13 +65,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
                   Portfolio HQ
                 </h2>
-                <p className="text-[11px] text-zinc-500 font-mono">Admin Telemetry</p>
+                <p className="text-[11px] text-zinc-500 font-mono">Admin Panel</p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live
-            </div>
+            <span className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
+              Admin
+            </span>
           </div>
 
           {/* Navigation Links */}
@@ -96,14 +92,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </span>
             <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-600">↗</span>
           </Link>
-
-          <div className="px-3 py-2 rounded-xl bg-zinc-100/60 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/50 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={13} className="text-zinc-500" />
-              <span className="text-[11px] text-zinc-500 font-medium">Session Secure</span>
-            </div>
-            <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">256-bit</span>
-          </div>
         </div>
       </aside>
 

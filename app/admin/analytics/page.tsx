@@ -1,9 +1,29 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { BarChart3, Users, Eye, TrendingUp, Monitor, Smartphone, Globe, Clock, LayoutTemplate, Trash2, CheckSquare, Square, AlertTriangle } from 'lucide-react';
+
+import { useState, useEffect, useMemo } from 'react';
+import { 
+  BarChart3, 
+  Users, 
+  Eye, 
+  TrendingUp, 
+  Monitor, 
+  Smartphone, 
+  Globe, 
+  Clock, 
+  Trash2, 
+  CheckSquare, 
+  Square, 
+  AlertTriangle,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Filter
+} from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ActivityCalendar } from 'react-activity-calendar';
 import GeoMap from './components/GeoMap';
+
+const MONO_COLORS = ['#f4f4f5', '#a1a1aa', '#71717a', '#52525b', '#3f3f46'];
 
 export default function AnalyticsAdmin() {
   const [data, setData] = useState<any>(null);
@@ -12,6 +32,12 @@ export default function AnalyticsAdmin() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [liveCount, setLiveCount] = useState(0);
+
+  // Table State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deviceFilter, setDeviceFilter] = useState<'all' | 'Desktop' | 'Mobile'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
 
   const fetchAnalytics = async () => {
     try {
@@ -29,7 +55,7 @@ export default function AnalyticsAdmin() {
   useEffect(() => {
     fetchAnalytics();
     
-    // Poll for live visitors every 10 seconds
+    // Poll for live visitors every 15 seconds
     const fetchLive = async () => {
       try {
         const res = await fetch('/api/analytics/live');
@@ -40,12 +66,13 @@ export default function AnalyticsAdmin() {
       } catch (e) {}
     };
     fetchLive();
-    const interval = setInterval(fetchLive, 10000);
+    const interval = setInterval(fetchLive, 15000);
     return () => clearInterval(interval);
   }, []);
 
   const handleDeleteSelected = async () => {
     if (selectedIds.length === 0) return;
+    if (!confirm(`Delete ${selectedIds.length} selected visit log(s)?`)) return;
     setIsDeleting(true);
     try {
       await fetch('/api/analytics', {
@@ -82,361 +109,589 @@ export default function AnalyticsAdmin() {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   };
 
-  const toggleAll = () => {
-    if (selectedIds.length === data?.recentVisits?.length) {
-      setSelectedIds([]);
+  const formatPath = (p: string) => (!p || p === '/') ? 'Home Page (/)' : p;
+
+  const formatDuration = (seconds?: number) => {
+    if (!seconds || seconds <= 0) return '0s';
+    const totalSec = Math.round(seconds);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
+    if (m > 0) return `${m}m ${s}s`;
+    return `${s}s`;
+  };
+
+  // Filtered visits
+  const filteredVisits = useMemo(() => {
+    const visits = data?.recentVisits || [];
+    return visits.filter((v: any) => {
+      if (deviceFilter !== 'all' && v.device !== deviceFilter) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      const country = (v.country || '').toLowerCase();
+      const city = (v.city || '').toLowerCase();
+      const path = (v.path || '').toLowerCase();
+      const browser = (v.browser || '').toLowerCase();
+      const os = (v.os || '').toLowerCase();
+      return country.includes(q) || city.includes(q) || path.includes(q) || browser.includes(q) || os.includes(q);
+    });
+  }, [data?.recentVisits, searchQuery, deviceFilter]);
+
+  // Reset to page 1 on filter/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, deviceFilter]);
+
+  // Pagination calculation
+  const totalPages = Math.max(1, Math.ceil(filteredVisits.length / pageSize));
+  const paginatedVisits = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredVisits.slice(start, start + pageSize);
+  }, [filteredVisits, currentPage, pageSize]);
+
+  const toggleAllCurrentPage = () => {
+    const currentPageIds = paginatedVisits.map((v: any) => v.id);
+    const allSelected = currentPageIds.every((id: string) => selectedIds.includes(id));
+    if (allSelected) {
+      setSelectedIds(prev => prev.filter(id => !currentPageIds.includes(id)));
     } else {
-      setSelectedIds(data?.recentVisits?.map((v: any) => v.id) || []);
+      setSelectedIds(prev => Array.from(new Set([...prev, ...currentPageIds])));
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-2 border-zinc-900 dark:border-white border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-6 h-6 border-2 border-zinc-900 dark:border-white border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
-
-  const formatPath = (p: string) => p === '/' ? 'Home Page' : p;
-
-  const formatDuration = (seconds: number) => {
-    if (!seconds) return '0s';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
-  };
+  const allPageIdsSelected = paginatedVisits.length > 0 && paginatedVisits.every((v: any) => selectedIds.includes(v.id));
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="space-y-8 animate-in fade-in duration-300 pb-16">
+      
+      {/* Top Header & Clear Action */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-zinc-200/60 dark:border-zinc-800/60">
         <div>
-          <h1 className="text-4xl font-black tracking-tight mb-2 bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-500 bg-clip-text text-transparent">Analytics Intelligence</h1>
-          <p className="text-zinc-500 text-sm font-medium">Deep insights into your portfolio's traffic and audience.</p>
+          <div className="font-mono text-[11px] text-zinc-500 uppercase tracking-widest mb-1.5">
+            Traffic Intelligence & Audit
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+            Analytics Telemetry
+          </h1>
+          <p className="text-xs md:text-sm text-zinc-500 mt-1">
+            Audience metrics, geographic distribution, and session history.
+          </p>
         </div>
-        <div className="flex gap-3">
-           <button 
-             onClick={() => setShowClearConfirm(true)}
-             className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold text-sm transition-colors flex items-center gap-2"
-           >
-             <Trash2 size={16} /> Clear All Logs
-           </button>
+
+        <div className="flex items-center gap-2">
+          {selectedIds.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              disabled={isDeleting}
+              className="px-3.5 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 rounded-xl font-medium text-xs transition-colors flex items-center gap-1.5"
+            >
+              <Trash2 size={13} />
+              Delete Selected ({selectedIds.length})
+            </button>
+          )}
+
+          <button 
+            onClick={() => setShowClearConfirm(true)}
+            className="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 rounded-xl font-medium text-xs transition-colors flex items-center gap-1.5"
+          >
+            <Trash2 size={13} /> Clear All Logs
+          </button>
         </div>
       </div>
 
+      {/* Clear All Confirmation Modal */}
       {showClearConfirm && (
-        <div className="p-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
-              <AlertTriangle size={24} />
+        <div className="p-5 bg-zinc-100 dark:bg-[#121216] border border-red-500/30 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 shrink-0">
+              <AlertTriangle size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-red-900 dark:text-red-200">Are you absolutely sure?</h3>
-              <p className="text-sm text-red-700 dark:text-red-400">This will permanently delete all analytics data. This action cannot be undone.</p>
+              <h3 className="text-xs font-semibold text-zinc-950 dark:text-zinc-100">Confirm Deletion</h3>
+              <p className="text-xs text-zinc-500">This will permanently delete all {data?.totalVisits || 0} preserved visit records.</p>
             </div>
           </div>
-          <div className="flex gap-3">
-            <button onClick={() => setShowClearConfirm(false)} className="px-5 py-2.5 bg-white dark:bg-black border border-red-200 dark:border-red-900 rounded-xl font-semibold text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors">Cancel</button>
-            <button onClick={handleClearAll} disabled={isDeleting} className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition-colors shadow-lg shadow-red-500/20">{isDeleting ? 'Deleting...' : 'Yes, Delete Everything'}</button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setShowClearConfirm(false)} 
+              className="px-3.5 py-1.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-medium text-xs hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button 
+              onClick={handleClearAll} 
+              disabled={isDeleting} 
+              className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium text-xs transition-colors"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Everything'}
+            </button>
           </div>
         </div>
       )}
 
-      {/* Live Visitors Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[32px] p-6 md:p-8 flex items-center justify-between shadow-lg shadow-blue-500/20 text-white animate-in zoom-in-95 duration-500 overflow-hidden w-full max-w-full">
-        <div className="flex items-center gap-4">
-          <div className="relative flex h-5 w-5">
-            {liveCount > 0 && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>}
-            <span className={`relative inline-flex rounded-full h-5 w-5 ${liveCount > 0 ? 'bg-green-400' : 'bg-white/30'}`}></span>
+      {/* Top 5 KPI Metrics Row (Monochrome Titanium) */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+        
+        {/* Total Pageviews */}
+        <div className="bg-white dark:bg-[#0d0d11] p-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 mb-2">
+            <span className="text-xs font-medium">Pageviews</span>
+            <Eye size={15} />
           </div>
-          <div>
-            <h3 className="text-xl font-bold tracking-tight">Real-Time Presence</h3>
-            <p className="text-blue-100 text-sm font-medium">Active sessions on your portfolio right now.</p>
+          <div className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
+            {data?.totalVisits || 0}
           </div>
+          <span className="text-[11px] text-zinc-400 mt-1">Total loads</span>
         </div>
-        <div className="text-5xl font-black">{liveCount}</div>
+
+        {/* Unique Visitors */}
+        <div className="bg-white dark:bg-[#0d0d11] p-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 mb-2">
+            <span className="text-xs font-medium">Unique Visitors</span>
+            <Users size={15} />
+          </div>
+          <div className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
+            {data?.uniqueVisitors || 0}
+          </div>
+          <span className="text-[11px] text-zinc-400 mt-1">Distinct audiences</span>
+        </div>
+
+        {/* Visits Today */}
+        <div className="bg-white dark:bg-[#0d0d11] p-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 mb-2">
+            <span className="text-xs font-medium">Visits Today</span>
+            <TrendingUp size={15} />
+          </div>
+          <div className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
+            {data?.todayVisits || 0}
+          </div>
+          <span className="text-[11px] text-zinc-400 mt-1">Past 24 hours</span>
+        </div>
+
+        {/* Live Presence (Clean Titanium Card - No Bright Blue Banner) */}
+        <div className="bg-white dark:bg-[#0d0d11] p-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between">
+          <div className="flex items-center justify-between text-zinc-500 mb-2">
+            <span className="text-xs font-medium">Active Now</span>
+            <span className="text-[10px] font-mono text-zinc-500">Live</span>
+          </div>
+          <div className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
+            {liveCount}
+          </div>
+          <span className="text-[11px] text-zinc-400 mt-1">Active sessions</span>
+        </div>
+
+        {/* Avg Duration (Fixed Math.round Bug) */}
+        <div className="bg-white dark:bg-[#0d0d11] p-4.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col justify-between col-span-2 md:col-span-1">
+          <div className="flex items-center justify-between text-zinc-500 mb-2">
+            <span className="text-xs font-medium">Avg. Duration</span>
+            <Clock size={15} />
+          </div>
+          <div className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100">
+            {formatDuration(data?.averageDuration || 0)}
+          </div>
+          <span className="text-[11px] text-zinc-400 mt-1">Time on site</span>
+        </div>
+
       </div>
 
-      {/* Top Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-blue-500/50 transition-colors overflow-hidden w-full max-w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-              <Eye size={20} />
-            </div>
-            <span className="font-semibold text-sm text-zinc-500">Total Pageviews</span>
+      {/* World Map Section (Monochrome Titanium) */}
+      <div className="bg-white dark:bg-[#0d0d11] p-5 md:p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Globe size={16} className="text-zinc-400" />
+            <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+              Geographic Distribution
+            </h3>
           </div>
-          <div className="text-5xl font-black tracking-tight">{data?.totalVisits || 0}</div>
+          <span className="text-[11px] font-mono text-zinc-500">
+            {data?.geoDistribution?.length || 0} Countries Represented
+          </span>
         </div>
 
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-purple-500/50 transition-colors overflow-hidden w-full max-w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-              <Users size={20} />
+        <div className="w-full h-[280px] md:h-[380px] bg-zinc-50 dark:bg-zinc-900/40 rounded-xl overflow-hidden flex items-center justify-center relative border border-zinc-200/60 dark:border-zinc-800/60">
+          {data?.geoDistribution && data.geoDistribution.length > 0 ? (
+            <div className="absolute inset-0 w-full h-full">
+              <GeoMap data={data.geoDistribution} />
             </div>
-            <span className="font-semibold text-sm text-zinc-500">Unique Visitors</span>
-          </div>
-          <div className="text-5xl font-black tracking-tight">{data?.uniqueVisitors || 0}</div>
-        </div>
-
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-green-500/50 transition-colors overflow-hidden w-full max-w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-500/10 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
-              <TrendingUp size={20} />
-            </div>
-            <span className="font-semibold text-sm text-zinc-500">Visits Today</span>
-          </div>
-          <div className="text-5xl font-black tracking-tight">{data?.todayVisits || 0}</div>
-        </div>
-
-        <div className="bg-white dark:bg-[#050505] p-6 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col justify-between h-40 group hover:border-amber-500/50 transition-colors overflow-hidden w-full max-w-full">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-              <Clock size={20} />
-            </div>
-            <span className="font-semibold text-sm text-zinc-500">Avg. Duration</span>
-          </div>
-          <div className="text-3xl font-black tracking-tight mt-2">{formatDuration(data?.averageDuration || 0)}</div>
+          ) : (
+            <p className="text-xs text-zinc-500">No geographic data recorded yet.</p>
+          )}
         </div>
       </div>
 
-      {/* Geographic Distribution - Full Width */}
-      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm overflow-hidden w-full max-w-full">
-         <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-          <Globe className="text-zinc-400" /> Geographic Distribution
-        </h3>
-        <div className="space-y-4 w-full">
-           {data?.geoDistribution && data.geoDistribution.length > 0 ? (
-              <div className="w-full h-[300px] md:h-[400px] bg-zinc-50 dark:bg-white/5 rounded-2xl overflow-hidden flex items-center justify-center cursor-move relative">
-                 <div className="absolute inset-0 w-full h-full">
-                    <GeoMap data={data.geoDistribution} />
-                 </div>
-              </div>
-           ) : (
-             <p className="text-zinc-500 text-sm">No location data available.</p>
-           )}
-        </div>
-      </div>
-
-      {/* Charts Section */}
+      {/* Charts: 7-Day Trend + Device Split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 7 Day Trend */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 flex flex-col h-full overflow-hidden w-full max-w-full">
-           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <TrendingUp className="text-zinc-400" /> 7-Day Traffic Trend
-          </h3>
-          <div className="flex-1 min-h-[300px] w-full">
+        
+        {/* 7-Day Traffic Trend */}
+        <div className="bg-white dark:bg-[#0d0d11] p-5 md:p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs lg:col-span-2 flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <TrendingUp size={16} className="text-zinc-400" />
+              <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                7-Day Traffic Trend
+              </h3>
+            </div>
+            <span className="text-[11px] font-mono text-zinc-500">Daily Volume</span>
+          </div>
+
+          <div className="h-[240px] w-full">
             {data?.chartData && data.chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data.chartData}>
-                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                  <XAxis dataKey="name" stroke="#71717a" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#71717a" fontSize={11} tickLine={false} axisLine={false} allowDecimals={false} />
                   <RechartsTooltip 
-                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)' }}
+                    contentStyle={{ 
+                      backgroundColor: '#18181b', 
+                      borderRadius: '12px', 
+                      border: '1px solid #27272a',
+                      color: '#fafafa',
+                      fontSize: '12px' 
+                    }} 
                   />
-                  <Line type="monotone" dataKey="visits" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                  <Line 
+                    type="monotone" 
+                    dataKey="visits" 
+                    stroke="#fafafa" 
+                    strokeWidth={2.5} 
+                    dot={{ r: 3, fill: '#18181b', strokeWidth: 2, stroke: '#fafafa' }} 
+                  />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-full flex items-center justify-center text-zinc-500 text-sm">Not enough data to display chart.</div>
+              <div className="h-full flex items-center justify-center text-xs text-zinc-500">Not enough data to display trend.</div>
             )}
           </div>
         </div>
 
-        {/* Device Distribution */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm flex flex-col h-full overflow-hidden w-full max-w-full">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <Monitor className="text-zinc-400" /> Device Split
-          </h3>
-          <div className="flex-1 flex flex-col items-center justify-center min-h-[300px]">
+        {/* Device Split */}
+        <div className="bg-white dark:bg-[#0d0d11] p-5 md:p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs flex flex-col">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Monitor size={16} className="text-zinc-400" />
+              <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                Device Distribution
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col items-center justify-center min-h-[200px]">
             {data?.deviceDistribution && data.deviceDistribution.length > 0 ? (
               <>
-                <div className="h-[200px] w-full">
+                <div className="h-[160px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
-                      <Pie data={data.deviceDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                      <Pie 
+                        data={data.deviceDistribution} 
+                        cx="50%" 
+                        cy="50%" 
+                        innerRadius={48} 
+                        outerRadius={68} 
+                        paddingAngle={4} 
+                        dataKey="value"
+                      >
                         {data.deviceDistribution.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell key={`cell-${index}`} fill={MONO_COLORS[index % MONO_COLORS.length]} />
                         ))}
                       </Pie>
-                      <RechartsTooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
+                      <RechartsTooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#18181b', 
+                          borderRadius: '10px', 
+                          border: '1px solid #27272a',
+                          color: '#fafafa',
+                          fontSize: '11px' 
+                        }} 
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex flex-wrap justify-center gap-4 mt-4">
+
+                <div className="flex flex-wrap justify-center gap-3 mt-3">
                   {data.deviceDistribution.map((entry: any, index: number) => (
-                    <div key={entry.name} className="flex items-center gap-2 text-sm font-medium">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                      {entry.name} ({entry.value})
+                    <div key={entry.name} className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: MONO_COLORS[index % MONO_COLORS.length] }} />
+                      <span>{entry.name}</span>
+                      <span className="font-mono text-[11px] text-zinc-400">({entry.value})</span>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <div className="text-zinc-500 text-sm">No device data available.</div>
+              <div className="text-xs text-zinc-500">No device data available.</div>
             )}
           </div>
         </div>
+
       </div>
 
-      {/* Annual Activity Heatmap */}
-      <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm w-full max-w-full overflow-hidden overflow-x-auto">
-        <h3 className="text-lg font-bold mb-6 flex items-center gap-2 min-w-max">
-          <TrendingUp className="text-zinc-400" /> Annual Activity
-        </h3>
-        <div className="min-w-max flex justify-center pb-4">
-          {data?.heatmapData && data.heatmapData.length > 0 ? (
-            <ActivityCalendar 
-              data={data.heatmapData} 
-              theme={{
-                light: ['#f4f4f5', '#dbeafe', '#93c5fd', '#3b82f6', '#1d4ed8'],
-                dark: ['#18181b', '#1e3a8a', '#2563eb', '#3b82f6', '#60a5fa'],
-              }}
-              labels={{
-                legend: {
-                  less: 'Less',
-                  more: 'More',
-                },
-                months: [
-                  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-                ],
-                totalCount: '{{count}} visits in the last year',
-              }}
-            />
-          ) : (
-            <div className="text-zinc-500 text-sm py-10">No activity data yet.</div>
-          )}
-        </div>
-      </div>
-
-      {/* Top Browsers and Recent Visits */}
+      {/* Annual Activity Heatmap & Top Browsers */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-1 h-fit overflow-hidden w-full max-w-full">
-           <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <Globe className="text-zinc-400" /> Top Browsers
-          </h3>
-          <div className="space-y-4">
-             {data?.browserDistribution && data.browserDistribution.length > 0 ? data.browserDistribution.map((browser: any, i: number) => (
-               <div key={browser.name} className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-white/5 rounded-2xl">
-                 <div className="flex items-center gap-3">
-                   <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">{i + 1}</div>
-                   <span className="font-semibold text-sm truncate max-w-[150px]">{browser.name}</span>
-                 </div>
-                 <div className="font-black text-lg">{browser.value}</div>
-               </div>
-             )) : (
-               <p className="text-zinc-500 text-sm">No browser data yet.</p>
-             )}
+        
+        {/* Heatmap */}
+        <div className="bg-white dark:bg-[#0d0d11] p-5 md:p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs lg:col-span-2 overflow-x-auto">
+          <div className="flex items-center justify-between mb-4 min-w-max">
+            <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100 flex items-center gap-2">
+              <TrendingUp size={16} className="text-zinc-400" />
+              Annual Activity Heatmap
+            </h3>
+            <span className="text-[11px] font-mono text-zinc-500">365 Days</span>
+          </div>
+
+          <div className="min-w-max flex justify-center py-2">
+            {data?.heatmapData && data.heatmapData.length > 0 ? (
+              <ActivityCalendar 
+                data={data.heatmapData} 
+                theme={{
+                  light: ['#f4f4f5', '#e4e4e7', '#a1a1aa', '#52525b', '#18181b'],
+                  dark: ['#18181b', '#27272a', '#3f3f46', '#71717a', '#f4f4f5'],
+                }}
+                labels={{
+                  legend: { less: 'Less', more: 'More' },
+                  months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                  totalCount: '{{count}} visits recorded',
+                }}
+              />
+            ) : (
+              <div className="text-xs text-zinc-500 py-6">No activity recorded yet.</div>
+            )}
           </div>
         </div>
 
-        {/* Recent Visits Log */}
-        <div className="bg-white dark:bg-[#050505] p-6 md:p-8 rounded-[32px] border border-zinc-200 dark:border-white/10 shadow-sm lg:col-span-2 overflow-hidden w-full max-w-full">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <h3 className="text-xl font-bold flex items-center gap-3">
-              <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl">
-                <BarChart3 size={20} className="text-blue-600 dark:text-blue-400" />
-              </div>
-              Detailed Visit Logs
-            </h3>
-            <div className="flex items-center gap-3">
-               <button 
-                  onClick={toggleAll}
-                  className="px-4 py-2 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
-                >
-                  {selectedIds.length === data?.recentVisits?.length && data?.recentVisits?.length > 0 ? <CheckSquare size={16}/> : <Square size={16}/>}
-                  Select All
-                </button>
-               {selectedIds.length > 0 && (
-                 <button 
-                   onClick={handleDeleteSelected}
-                   disabled={isDeleting}
-                   className="px-4 py-2 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 animate-in zoom-in"
-                 >
-                   <Trash2 size={16} /> Delete ({selectedIds.length})
-                 </button>
-               )}
+        {/* Top Browsers */}
+        <div className="bg-white dark:bg-[#0d0d11] p-5 md:p-6 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs">
+          <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100 mb-4 flex items-center gap-2">
+            <Globe size={16} className="text-zinc-400" />
+            Top Browsers
+          </h3>
+          <div className="space-y-2">
+            {data?.browserDistribution && data.browserDistribution.length > 0 ? (
+              data.browserDistribution.map((browser: any, i: number) => (
+                <div key={browser.name} className="flex items-center justify-between p-2.5 bg-zinc-50 dark:bg-zinc-900/50 rounded-xl border border-zinc-200/50 dark:border-zinc-800/50">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono text-xs text-zinc-400 w-4">{i + 1}.</span>
+                    <span className="text-xs font-medium text-zinc-900 dark:text-zinc-200">{browser.name}</span>
+                  </div>
+                  <span className="font-mono text-xs font-semibold text-zinc-700 dark:text-zinc-300">{browser.value}</span>
+                </div>
+              ))
+            ) : (
+              <p className="text-xs text-zinc-500">No browser data yet.</p>
+            )}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Detailed Visit Logs: Paginated Clean Table (MVP Design) */}
+      <div className="bg-white dark:bg-[#0d0d11] rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs overflow-hidden">
+        
+        {/* Table Controls Header */}
+        <div className="p-5 border-b border-zinc-200/70 dark:border-zinc-800/70 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h3 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                Detailed Visit Logs
+              </h3>
+              <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
+                {filteredVisits.length} Records
+              </span>
+            </div>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              High-density paginated audit stream • Page {currentPage} of {totalPages}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {/* Search */}
+            <div className="relative md:w-52">
+              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                placeholder="Search country, path..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:border-zinc-400 dark:focus:border-zinc-600 transition-colors"
+              />
+            </div>
+
+            {/* Device Filter */}
+            <div className="flex items-center bg-zinc-100 dark:bg-zinc-900 p-0.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800/80 text-xs">
+              <button
+                onClick={() => setDeviceFilter('all')}
+                className={`px-2.5 py-1 text-[11px] font-medium rounded-lg transition-all ${
+                  deviceFilter === 'all'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setDeviceFilter('Desktop')}
+                className={`px-2 py-1 text-[11px] font-medium rounded-lg transition-all ${
+                  deviceFilter === 'Desktop'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                Desktop
+              </button>
+              <button
+                onClick={() => setDeviceFilter('Mobile')}
+                className={`px-2 py-1 text-[11px] font-medium rounded-lg transition-all ${
+                  deviceFilter === 'Mobile'
+                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                    : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                Mobile
+              </button>
             </div>
           </div>
-          
-          {data?.recentVisits?.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 bg-zinc-100 dark:bg-white/5 rounded-full flex items-center justify-center mb-4">
-                <Eye size={24} className="text-zinc-400" />
-              </div>
-              <h4 className="text-zinc-900 dark:text-white font-medium mb-1">No visits recorded yet</h4>
-              <p className="text-zinc-500 text-sm">Wait for some traffic to see detailed analytics here.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {data?.recentVisits?.map((v: any) => {
-                const isSelected = selectedIds.includes(v.id);
-                return (
-                <div 
-                  key={v.id} 
-                  onClick={() => toggleSelection(v.id)}
-                  className={`group flex flex-col md:flex-row md:items-center justify-between p-4 md:p-5 rounded-3xl transition-all duration-300 border cursor-pointer gap-4
-                    ${isSelected 
-                      ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' 
-                      : 'bg-zinc-50 dark:bg-white/5 border-transparent hover:border-zinc-200 dark:hover:border-white/10'
-                    }`}
-                >
-                  
-                  <div className="flex items-center gap-4">
-                    <div className={`text-zinc-400 transition-colors ${isSelected ? 'text-blue-600 dark:text-blue-400' : 'group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}`}>
-                      {isSelected ? <CheckSquare size={20} /> : <Square size={20} />}
-                    </div>
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-inner ${v.device === 'Mobile' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' : 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'}`}>
-                      {v.device === 'Mobile' ? <Smartphone size={24} /> : <Monitor size={24} />}
-                    </div>
-                    
-                    <div className="flex flex-col">
-                      <span className="font-bold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
-                        <LayoutTemplate size={14} className="text-zinc-400" />
-                        {formatPath(v.path)}
-                      </span>
-                      <span className="text-xs text-zinc-500 flex items-center gap-1 mt-1.5 font-medium">
-                        <Clock size={12} />
-                        {new Date(v.visitedAt).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-  
-                  <div className="flex flex-wrap items-center gap-2 md:gap-3 md:justify-end">
-                    {v.duration !== undefined && v.duration > 0 && (
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-xs font-bold text-amber-700 dark:text-amber-400 shadow-sm">
-                        <Clock size={14} />
-                        {formatDuration(v.duration)}
-                      </span>
-                    )}
-                    {v.country && (
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
-                        <Globe size={14} className="text-blue-500" />
-                        {v.city && v.city !== 'Unknown' ? `${v.city}, ` : ''}{v.country}
-                      </span>
-                    )}
-                    {(v.browser || v.os) && (
-                      <span className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-black/40 border border-zinc-200 dark:border-white/10 rounded-xl text-xs font-semibold text-zinc-700 dark:text-zinc-300 shadow-sm">
-                        {v.browser && v.browser !== 'Unknown' ? v.browser : ''}
-                        {v.browser && v.browser !== 'Unknown' && v.os && v.os !== 'Unknown' ? ' on ' : ''}
-                        {v.os && v.os !== 'Unknown' ? v.os : ''}
-                        {(!v.browser || v.browser === 'Unknown') && (!v.os || v.os === 'Unknown') ? 'Unknown Device' : ''}
-                      </span>
-                    )}
-                  </div>
-  
-                </div>
-              )})}
-            </div>
-          )}
         </div>
+
+        {/* Paginated Table View */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="border-b border-zinc-200/70 dark:border-zinc-800/70 bg-zinc-50/50 dark:bg-zinc-900/30 text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+                <th className="py-2.5 px-4 w-10">
+                  <button onClick={toggleAllCurrentPage} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200">
+                    {allPageIdsSelected ? <CheckSquare size={15} /> : <Square size={15} />}
+                  </button>
+                </th>
+                <th className="py-2.5 px-3">Device & Origin</th>
+                <th className="py-2.5 px-3">Page Path</th>
+                <th className="py-2.5 px-3">Client / OS</th>
+                <th className="py-2.5 px-3">Duration</th>
+                <th className="py-2.5 px-4 text-right">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+              {paginatedVisits.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-12 text-center text-xs text-zinc-500">
+                    No visit records found matching your filters.
+                  </td>
+                </tr>
+              ) : (
+                paginatedVisits.map((v: any) => {
+                  const isSelected = selectedIds.includes(v.id);
+                  const isMobile = v.device === 'Mobile';
+                  const locationText = v.country && v.country !== 'Unknown'
+                    ? `${v.city && v.city !== 'Unknown' ? `${v.city}, ` : ''}${v.country}`
+                    : 'Unknown Location';
+
+                  return (
+                    <tr 
+                      key={v.id}
+                      onClick={() => toggleSelection(v.id)}
+                      className={`cursor-pointer transition-colors ${
+                        isSelected 
+                          ? 'bg-zinc-100/90 dark:bg-zinc-800/70' 
+                          : 'hover:bg-zinc-50/80 dark:hover:bg-zinc-900/50'
+                      }`}
+                    >
+                      {/* Checkbox */}
+                      <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          onClick={() => toggleSelection(v.id)} 
+                          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                        >
+                          {isSelected ? <CheckSquare size={15} className="text-zinc-900 dark:text-zinc-100" /> : <Square size={15} />}
+                        </button>
+                      </td>
+
+                      {/* Device & Origin */}
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">
+                            {isMobile ? <Smartphone size={13} /> : <Monitor size={13} />}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-zinc-900 dark:text-zinc-100 block">
+                              {locationText}
+                            </span>
+                            <span className="text-[10px] text-zinc-400 font-mono">
+                              {v.device || 'Desktop'}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Page Path */}
+                      <td className="py-3 px-3">
+                        <span className="font-mono text-[11px] text-zinc-700 dark:text-zinc-300 px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60">
+                          {formatPath(v.path)}
+                        </span>
+                      </td>
+
+                      {/* Client / OS */}
+                      <td className="py-3 px-3 text-zinc-600 dark:text-zinc-400">
+                        <div className="text-[11px]">
+                          <span>{v.browser || 'Unknown'}</span>
+                          {v.os && <span className="text-zinc-400"> on {v.os}</span>}
+                        </div>
+                      </td>
+
+                      {/* Duration */}
+                      <td className="py-3 px-3 font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
+                        {v.duration !== undefined && v.duration > 0 ? formatDuration(v.duration) : '—'}
+                      </td>
+
+                      {/* Timestamp */}
+                      <td className="py-3 px-4 text-right font-mono text-[11px] text-zinc-400 dark:text-zinc-500 whitespace-nowrap">
+                        {new Date(v.visitedAt).toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table Pagination Footer */}
+        <div className="p-3.5 bg-zinc-50/70 dark:bg-zinc-900/30 border-t border-zinc-200/70 dark:border-zinc-800/70 flex items-center justify-between text-xs text-zinc-500">
+          <span className="font-mono text-[11px]">
+            Showing {filteredVisits.length > 0 ? (currentPage - 1) * pageSize + 1 : 0}–{Math.min(currentPage * pageSize, filteredVisits.length)} of {filteredVisits.length} logs
+          </span>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <ChevronLeft size={14} />
+            </button>
+
+            <span className="font-mono text-[11px] px-2 py-0.5">
+              {currentPage} / {totalPages}
+            </span>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+        </div>
+
       </div>
+
     </div>
   );
 }

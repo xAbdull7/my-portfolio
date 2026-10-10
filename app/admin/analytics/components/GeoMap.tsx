@@ -26,7 +26,7 @@ export default function GeoMap({ data }: GeoMapProps) {
   const maxCount = Math.max(...data.map(d => d.count), 1);
   const colorScale = scaleLinear<string>()
     .domain([1, maxCount])
-    .range(["#fbcfe8", "#9d174d"]); // From Light Pink to Dark Pink
+    .range(["#71717a", "#ffffff"]); // From zinc-500 to titanium white
 
   const dataMap = data.reduce((acc, curr) => {
     const numericCode = isoCountries.alpha2ToNumeric(curr.country);
@@ -58,13 +58,12 @@ export default function GeoMap({ data }: GeoMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={hasData ? colorScale(geoData.count) : "currentColor"}
-                    className={hasData ? "" : "text-zinc-200 dark:text-white/5"}
-                    stroke={hasData ? "#831843" : "currentColor"}
-                    strokeWidth={hasData ? 1 : 0.5}
-                    strokeDasharray={hasData ? "2,2" : "none"}
+                    className={hasData ? "" : "text-zinc-200 dark:text-zinc-900/80"}
+                    stroke={hasData ? "#d4d4d8" : "currentColor"}
+                    strokeWidth={hasData ? 0.8 : 0.4}
                     style={{
                       default: { outline: "none" },
-                      hover: { fill: hasData ? "#be185d" : "", outline: "none" },
+                      hover: { fill: hasData ? "#ffffff" : "#27272a", outline: "none" },
                       pressed: { outline: "none" },
                     }}
                     onMouseEnter={() => {
