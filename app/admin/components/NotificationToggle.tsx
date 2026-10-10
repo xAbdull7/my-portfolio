@@ -101,24 +101,27 @@ export default function NotificationToggle() {
     <button 
       onClick={!isSubscribed ? handleSubscribe : handleUnsubscribe}
       disabled={loading}
-      className={`p-3 md:px-4 md:py-2.5 rounded-2xl md:rounded-full font-semibold transition-all flex items-center justify-center gap-2 text-sm shadow-sm hover:scale-105 active:scale-95 cursor-pointer
+      className={`w-full py-2.5 px-3.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center justify-between border cursor-pointer
         ${isSubscribed 
-          ? 'bg-zinc-100 dark:bg-white/5 text-green-600 dark:text-green-400' 
-          : 'bg-zinc-900 text-white dark:bg-white dark:text-black'
+          ? 'bg-zinc-100/80 dark:bg-zinc-900/80 border-zinc-300 dark:border-zinc-800 text-zinc-900 dark:text-zinc-200 hover:border-zinc-400 dark:hover:border-zinc-700' 
+          : 'bg-zinc-100/50 dark:bg-zinc-900/40 border-zinc-200 dark:border-zinc-800/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700'
         } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
-      title={isSubscribed ? "إلغاء الإشعارات" : "تفعيل الإشعارات"}
+      title={isSubscribed ? "Disable push notifications" : "Enable push notifications"}
     >
-      {isSubscribed ? (
-        <>
-          <BellOff size={18} /> 
-          <span className="hidden md:inline">{loading ? 'جاري الإلغاء...' : 'إلغاء الإشعارات'}</span>
-        </>
-      ) : (
-        <>
-          <Bell size={18} />
-          <span className="hidden md:inline">{loading ? 'جاري التفعيل...' : 'تفعيل الإشعارات'}</span>
-        </>
-      )}
+      <div className="flex items-center gap-2.5">
+        <div className={`p-1.5 rounded-lg ${isSubscribed ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100' : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'}`}>
+          {isSubscribed ? <BellRing size={14} className="text-zinc-800 dark:text-zinc-200" /> : <Bell size={14} />}
+        </div>
+        <span className="font-medium tracking-tight">
+          {loading ? 'Updating...' : isSubscribed ? 'Push Alerts' : 'Enable Alerts'}
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <span className={`w-1.5 h-1.5 rounded-full ${isSubscribed ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 'bg-zinc-400 dark:bg-zinc-600'}`} />
+        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-mono">
+          {isSubscribed ? 'ON' : 'OFF'}
+        </span>
+      </div>
     </button>
   );
 }

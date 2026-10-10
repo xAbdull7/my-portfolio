@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
-import { Home, LogOut } from 'lucide-react';
+import { ExternalLink, ShieldCheck } from 'lucide-react';
 import { getServerSession } from 'next-auth';
+import { prisma } from '@/lib/prisma';
 import NotificationToggle from './components/NotificationToggle';
 import { DesktopNav, MobileNav } from './components/AdminNav';
 
@@ -10,54 +11,110 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-white flex items-center justify-center p-4 w-full">
+      <div className="min-h-screen bg-zinc-100 dark:bg-[#09090b] font-sans text-zinc-900 dark:text-zinc-100 flex items-center justify-center p-4 w-full">
         {children}
       </div>
     );
   }
 
+  // Fetch counts safely for the sidebar live badges without extra client roundtrips
+  const [unreadMessages, totalVisits, totalProjects] = await Promise.all([
+    prisma.message.count({ where: { read: false } }).catch(() => 0),
+    prisma.pageVisit.count().catch(() => 0),
+    prisma.project.count().catch(() => 0),
+  ]);
+
+  const counts = { unreadMessages, totalVisits, totalProjects };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-white flex flex-col md:flex-row">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] font-sans text-zinc-900 dark:text-zinc-100 flex flex-col md:flex-row antialiased selection:bg-zinc-800 selection:text-white">
       
       {/* Mobile Top Header */}
-      <div className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#050505]/80 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5 p-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold tracking-tight">Admin</h2>
+      <header className="md:hidden sticky top-0 z-40 bg-white/80 dark:bg-[#0d0d11]/85 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800/80 px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-[11px]">
+            OS
+          </div>
+          <div>
+            <h2 className="text-xs font-semibold tracking-tight">Admin Console</h2>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] text-zinc-500 font-mono">System Online</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <NotificationToggle />
-          <Link href="/" className="p-2 bg-zinc-100 dark:bg-white/5 rounded-full text-zinc-600 dark:text-zinc-400">
-            <Home size={18} />
+          <Link
+            href="/"
+            target="_blank"
+            className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/60 dark:bg-zinc-900/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+            title="Open Portfolio"
+          >
+            <ExternalLink size={15} />
           </Link>
         </div>
-      </div>
+      </header>
 
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-72 bg-white dark:bg-[#050505] border-r border-zinc-200 dark:border-white/5 p-6 flex-col gap-8 sticky top-0 h-screen z-40">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Admin</h2>
-          <p className="text-zinc-500 text-sm mt-1">Manage your portfolio content</p>
+      {/* Desktop Sidebar (Monochrome Titanium) */}
+      <aside className="hidden md:flex w-64 lg:w-72 bg-white dark:bg-[#0d0d11] border-r border-zinc-200/80 dark:border-zinc-800/80 p-5 flex-col justify-between sticky top-0 h-screen z-40 shrink-0">
+        <div className="space-y-6">
+          {/* Header & Status Indicator */}
+          <div className="flex items-center justify-between pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+                OS
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold tracking-tight text-zinc-950 dark:text-zinc-100">
+                  Portfolio HQ
+                </h2>
+                <p className="text-[11px] text-zinc-500 font-mono">Admin Telemetry</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[10px] font-mono text-zinc-600 dark:text-zinc-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <DesktopNav counts={counts} />
         </div>
-        
-        <DesktopNav />
-        
-        <div className="mt-auto pt-6 border-t border-zinc-200 dark:border-white/5 flex flex-col gap-2">
+
+        {/* Sidebar Footer */}
+        <div className="pt-4 border-t border-zinc-200/80 dark:border-zinc-800/80 flex flex-col gap-2.5">
           <NotificationToggle />
-          <Link href="/" className="px-4 py-3 rounded-2xl hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors font-medium text-sm flex items-center gap-3 text-zinc-600 dark:text-zinc-400">
-            <Home size={18} /> Back to Site
+
+          <Link
+            href="/"
+            target="_blank"
+            className="group px-3 py-2 rounded-xl border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900/60 transition-all font-medium text-xs flex items-center justify-between text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-zinc-100"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink size={14} className="text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300" />
+              Live Website
+            </span>
+            <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-600">↗</span>
           </Link>
+
+          <div className="px-3 py-2 rounded-xl bg-zinc-100/60 dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/50 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={13} className="text-zinc-500" />
+              <span className="text-[11px] text-zinc-500 font-medium">Session Secure</span>
+            </div>
+            <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-500">256-bit</span>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 pb-28 pt-6 md:p-12 md:pb-12 max-w-5xl mx-auto w-full">
+      {/* Main Content Area */}
+      <main className="flex-1 p-4 pb-28 pt-5 md:p-8 lg:p-10 md:pb-12 max-w-7xl mx-auto w-full min-w-0">
         {children}
       </main>
 
-      {/* Mobile Bottom Tab Bar (Liquid Glass) */}
-      <div className="md:hidden fixed bottom-6 left-4 right-4 z-50 bg-white/70 dark:bg-black/40 backdrop-blur-2xl border border-white/50 dark:border-white/10 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(255,255,255,0.05)]">
-        <MobileNav />
+      {/* Mobile Bottom Tab Bar */}
+      <div className="md:hidden fixed bottom-4 left-3 right-3 z-50 bg-white/90 dark:bg-[#0d0d11]/90 backdrop-blur-2xl border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl shadow-xl">
+        <MobileNav counts={counts} />
       </div>
     </div>
   );
